@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2021.3.3)  8 MAR 2021 01:55
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2021.3.3)  10 MAR 2021 02:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -767,7 +767,7 @@ LaTeX Font Warning: Font shape `T1/lmr/bx/sc' undefined
 (Font)              using `T1/lmr/bx/n' instead on input line 71.
 
 LaTeX Font Info:    Trying to load font information for T1+lmss on input line 9
-8.
+7.
 (c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/t1lmss.fd
 File: t1lmss.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
@@ -780,105 +780,115 @@ Package microtype Info: Loading generic protrusion settings for font family
 
 {c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdft
 ex.map}]
-<fig1.pdf, id=148, 614.295pt x 397.485pt>
+<fig1.pdf, id=149, 614.295pt x 397.485pt>
 File: fig1.pdf Graphic file (type pdf)
 <use fig1.pdf>
-Package pdftex.def Info: fig1.pdf  used on input line 230.
+Package pdftex.def Info: fig1.pdf  used on input line 229.
 (pdftex.def)             Requested size: 491.43666pt x 317.98842pt.
 
 Underfull \vbox (badness 1783) has occurred while \output is active []
 
-[2] [3 <./fig1.pdf>] [4]
-<fig2.pdf, id=287, 794.97pt x 505.89pt>
+[2] [3 <./fig1.pdf>]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[4]
+<fig2.pdf, id=290, 794.97pt x 505.89pt>
 File: fig2.pdf Graphic file (type pdf)
 <use fig2.pdf>
-Package pdftex.def Info: fig2.pdf  used on input line 445.
+Package pdftex.def Info: fig2.pdf  used on input line 470.
 (pdftex.def)             Requested size: 556.4752pt x 354.12057pt.
 
-Overfull \hbox (39.15012pt too wide) in paragraph at lines 444--449
+Overfull \hbox (39.15012pt too wide) in paragraph at lines 469--474
 []|  [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 449--449
+Underfull \hbox (badness 10000) in paragraph at lines 474--474
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 449--449
+Underfull \hbox (badness 10000) in paragraph at lines 474--474
 
  []
 
 
-Underfull \hbox (badness 1072) in paragraph at lines 449--449
+Underfull \hbox (badness 1072) in paragraph at lines 474--474
 []$\T1/lmr/m/n/10 (+20) . Pat-terns of non-lin-ear se-lec-tion on two be-hav-io
 ral RN pa-ram-e-ters $[]$ and $[]$.
  []
 
 
-Underfull \vbox (badness 2837) has occurred while \output is active []
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[5] [6 <./fig2.pdf>] [7pdfTeX warning (ext4): destination with the same identif
-ier (name{equation.3.1}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  
-l.607 \end{equation}
-                    ]pdfTeX warning (ext4): destination with the same identifie
-r (name{equation.3.1}) has been already used, duplicate ignored
+[5] [6 <./fig2.pdf>] [7]pdfTeX warning (ext4): destination with the same identi
+fier (name{equation.3.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.635 \begin{equation}
-                       \tag{1.3}\label{eq:1.3}
-Underfull \vbox (badness 2057) has occurred while \output is active []
-
-[8] [9]pdfTeX warning (ext4): destination with the same identifier (name{equati
-on.3.1}) has been already used, duplicate ignored
+l.609 \begin{equation}
+                       \tag{1.2}\label{eq:1.2}pdfTeX warning (ext4): destinatio
+n with the same identifier (name{equation.3.1}) has been already used, duplicat
+e ignored
 <to be read again> 
                    \relax 
-l.843 \begin{equation}
-                       \tag{2}\label{eq:2}pdfTeX warning (ext4): destination wi
+l.673 \begin{equation}
+                       \tag{1.3}\label{eq:1.3} [8] [9]pdfTeX warning (ext4): de
+stination with the same identifier (name{equation.3.1}) has been already used, 
+duplicate ignored
+<to be read again> 
+                   \relax 
+l.881 \begin{equation}
+                       \tag{2}\label{eq:2}
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[10]pdfTeX warning (ext4): destination with the same identifier (name{equation.
+3.1}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.921 \begin{equation}
+                       \tag{3}\label{eq:3}pdfTeX warning (ext4): destination wi
 th the same identifier (name{equation.3.1}) has been already used, duplicate ig
 nored
 <to be read again> 
                    \relax 
-l.883 \begin{equation}
-                       \tag{3}\label{eq:3} [10]pdfTeX warning (ext4): destinati
-on with the same identifier (name{equation.3.1}) has been already used, duplica
-te ignored
-<to be read again> 
-                   \relax 
-l.913 \begin{equation}
+l.951 \begin{equation}
                        \tag{4.1}\label{eq:4.1}pdfTeX warning (ext4): destinatio
 n with the same identifier (name{equation.3.1}) has been already used, duplicat
 e ignored
 <to be read again> 
                    \relax 
-l.926 variances. \begin{equation}
+l.964 variances. \begin{equation}
                                   \tag{4.2}\label{eq:4.2} [11]
-<fig3_2.pdf, id=450, 722.7pt x 505.89pt>
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[12]
+<fig3_2.pdf, id=479, 722.7pt x 505.89pt>
 File: fig3_2.pdf Graphic file (type pdf)
 <use fig3_2.pdf>
-Package pdftex.def Info: fig3_2.pdf  used on input line 1083.
+Package pdftex.def Info: fig3_2.pdf  used on input line 1121.
 (pdftex.def)             Requested size: 527.5666pt x 369.29662pt.
 
-Overfull \hbox (14.50925pt too wide) in paragraph at lines 1082--1087
+Overfull \hbox (14.50925pt too wide) in paragraph at lines 1120--1125
 []|  [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1087--1087
+Underfull \hbox (badness 10000) in paragraph at lines 1125--1125
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1087--1087
+Underfull \hbox (badness 10000) in paragraph at lines 1125--1125
 
  []
 
 
-LaTeX Warning: Float too large for page by 13.63313pt on input line 1089.
+LaTeX Warning: Float too large for page by 13.63313pt on input line 1127.
 
-[12] [13 <./fig3_2.pdf>] [14] [15]
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[13] [14 <./fig3_2.pdf>] [15]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 [16]
@@ -904,12 +914,12 @@ Package rerunfilecheck Info: File `BLUP-manuscript-alt.out' has not changed.
  ) 
 Here is how much of TeX's memory you used:
  14078 strings out of 480971
- 225659 string characters out of 5906169
- 702013 words of memory out of 5000000
+ 225663 string characters out of 5906169
+ 699736 words of memory out of 5000000
  30643 multiletter control sequences out of 15000+600000
- 475263 words of font info for 180 fonts, out of 8000000 for 9000
+ 475180 words of font info for 179 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 83i,16n,88p,3259b,440s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 83i,16n,88p,3259b,427s stack positions out of 5000i,500n,10000p,200000b,80000s
 {c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.
 enc}{c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-m
 athsy.enc}{c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/l
@@ -938,10 +948,10 @@ mar/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy5.pfb><c:/User
 s/jormar/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb><c:
 /Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.p
 fb>
-Output written on BLUP-manuscript-alt.pdf (21 pages, 578154 bytes).
+Output written on BLUP-manuscript-alt.pdf (21 pages, 580841 bytes).
 PDF statistics:
- 724 PDF objects out of 1000 (max. 8388607)
- 668 compressed objects within 7 object streams
- 168 named destinations out of 1000 (max. 500000)
+ 738 PDF objects out of 1000 (max. 8388607)
+ 682 compressed objects within 7 object streams
+ 170 named destinations out of 1000 (max. 500000)
  35504 words of extra memory for PDF output out of 35830 (max. 10000000)
 

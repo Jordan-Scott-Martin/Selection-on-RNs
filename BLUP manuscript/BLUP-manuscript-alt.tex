@@ -14,8 +14,8 @@
 \usepackage{lipsum}
 \usepackage{graphicx}
 
-\title{Estimating (Non)linear Selection on \linebreak Personality,
-Plasticity, and Predictability}
+\title{Estimating (Non)linear Selection on \linebreak Behavioral
+Reaction Norms}
 
 \author{
     Jordan S. Martin
@@ -78,23 +78,22 @@ variation. Unfortunately, however, it remains challenging to assess the
 effects of reaction norms on fitness-relevant outcomes, due to the high
 degree of uncertainty in random effect estimates of reaction norm
 parameters, also known as best linear unbiased predictors (BLUPs).
-Previous solutions to this problem avoid inferential bias by limiting
-analyses to the description of linear covariances and correlations among
-BLUPs and other measures. As such, empiricists currently lack a method
-for exploring and explaining reaction norms effects with nonlinear
-structure, such as stabilizing, disruptive, balancing, and/or
-correlational selection, which are necessary for testing adaptive theory
-of individual variation. To address this issue, a solution is presented
-for unbiased estimation of nonlinear reaction norm effects on fitness or
-any other outcome of interest. This solution involves specifying BLUPs
-as both random and fixed effects in a single Bayesian multi-response
-model. By simultaneously accounting for uncertainty in BLUPs and their
-causal effects on other measures, the risks accompanying classical
-approaches can be effectively avoided. A novel method for visualizing
-multivariate selection with such models is also proposed. Simulations
-are then used to assess the properties of these models under realistic
-empirical scenarios. Coding tutorials are additionally provided to aid
-researchers in applying this method to their own datasets in R.
+Current approaches to this problem do not provide a generalized solution
+for modelling reaction norm effects with nonlinear structure, such as
+stabilizing, disruptive, balancing, and/or correlational selection,
+which are necessary for testing adaptive theory of individual variation.
+To address this issue, a solution is presented for straightforward and
+unbiased estimation of nonlinear reaction norm effects on fitness or any
+other outcome of interest, for Gaussian and non-Gaussian measurements.
+This solution involves specifying BLUPs as both random and fixed effects
+in a single Bayesian multi-response model. By simultaneously accounting
+for uncertainty in BLUPs and their causal effects on other measures, the
+risks accompanying classical approaches can be effectively avoided. A
+novel method for visualizing multivariate selection with such models is
+also proposed. Simulations are then used to assess the properties of
+these models under realistic empirical scenarios. Coding tutorials are
+additionally provided to aid researchers in applying this method to
+their own datasets in R.
 \end{abstract}
 
 \keywords{
@@ -407,17 +406,34 @@ effects (\protect\hyperlink{ref-Phillips1989}{Phillips and Arnold
 1989}), or higher term polynomials, as shown in \textbf{Figure
 \ref{fig:fig2}} for a bivariate analysis.
 
+A potential solution to this challenge is to model the squared and
+product values of raw measurements as additional responses with
+covarying random effects, which can subsequently be used to calculate
+nonlinear selection gradients
+(\protect\hyperlink{ref-Ding2021}{Dingemanse, Araya‐Ajoy, and Westneat
+2021}). However, this approach confounds the fitness effects of
+personality, plasticity, and predictability, can be biased by unbalanced
+sampling, and does not appropriately partition nonlinear patterns of
+between- and within-individual (co)variation in non-Gaussian
+measurements. To appropriately calculate nonlinear selection gradients
+for non-Gaussian responses, expected trait values should be first
+estimated on a latent linear scale, through the use of an appropriate
+GLMM link function, before being squared or multiplied together. This
+ensures that appropriate nonlinear mean and variance effects are
+correctly predicted on the original data scale
+(\protect\hyperlink{ref-Nelder1972}{Nelder and Wedderburn 1972}).
+
 \hypertarget{two-stage-analyses}{%
 \subsection{Two-stage analyses}\label{two-stage-analyses}}
 
-One apparent but flawed solution to the challenges posed by the random
-effects method is to instead (i) estimate BLUP posteriors in a Bayesian
-random effects model, and then (ii) estimate a separate model with fixed
-RN effects, running the analysis repeatedly over the posterior
-distribution of BLUPs estimated in the first model. While this approach
-technically carries the uncertainty in RNs forward, thus avoiding the
-undesirable consequences of point estimates, it nevertheless results in
-downwardly biased estimates of the RN fixed effects, as
+Another solution to the challenges posed by the random effects method is
+to instead (i) estimate BLUP posteriors in a Bayesian random effects
+model, and then (ii) estimate a separate model with fixed RN effects,
+running the analysis repeatedly over the posterior distribution of BLUPs
+estimated in the first model. While this approach technically carries
+the uncertainty in RNs forward, thus avoiding the undesirable
+consequences of point estimates, it nevertheless results in downwardly
+biased estimates of the RN fixed effects, as
 \protect\hyperlink{ref-Ding2020b}{Dingemanse et al.}
 (\protect\hyperlink{ref-Ding2020b}{2020}) observed in supplementary
 simulations. Although these authors did not provide an explanation for
@@ -438,7 +454,16 @@ statistical inferences, not directly measured trait values or mere
 averages of raw trait values, and as such are particularly sensitive to
 correct model specification
 (\protect\hyperlink{ref-Hadfield2010}{Hadfield et al. 2010};
-\protect\hyperlink{ref-Postma2006}{Postma 2006}).
+\protect\hyperlink{ref-Postma2006}{Postma 2006}). A related alternative
+solution is to handle attenuation bias by adjusting selection
+coefficients on raw trait values with repeatability estimates, rather
+than directly using BLUPs in the fitness model
+(\protect\hyperlink{ref-Ding2021}{Dingemanse, Araya‐Ajoy, and Westneat
+2021}). However, this approach does not provide a means of
+differentiating (non)linear selection on personality, plasticity and
+predictability, nor does it generalize to non-Gaussian measurements
+where repeatability is best expressed on a transformed linear scale due
+to non-linear mean and variance effects on the original scale.
 
 \begin{figure}
 \hspace*{-1.75cm}
@@ -606,16 +631,29 @@ w_{j} \sim \mathrm{Normal} \left( \mu_{j}, \sigma _{j} \right) \nonumber \\
 \end{gathered}
 \end{equation}
 
-Those familiar with structural equation modelling
+Readers familiar with structural equation modelling
 (\protect\hyperlink{ref-Araya2014}{Araya-Ajoy and Dingemanse 2014};
 \protect\hyperlink{ref-Martin2019}{Martin et al. 2019}) may note that
 each RN parameter in this model can be conceptualized as an exogenous
 latent variable, with its loading on trait \(z\) fixed to 1, thus
 scaling the zero-centered latent variable, and its loadings on trait
-\(w\) estimated with the regression coefficients. When this quadratic
-regression model effectively approximates the individual selection
-surface (\protect\hyperlink{ref-Lande1983}{Lande and Arnold 1983};
-\protect\hyperlink{ref-Phillips1989}{Phillips and Arnold 1989}),
+\(w\) estimated with the regression coefficients. These latent variables
+separate out the portions of variance in trait \(\boldsymbol{z}\) due to
+each latent RN parameter and, therefore, isolate distinct RN effects on
+fitness from all other sources of non-repeatable variation in the raw
+trait values. The proposed model can also be conceptualized as an
+extension of the so-called `errors-in-variables' models discussed by
+\protect\hyperlink{ref-Ding2021}{Dingemanse, Araya‐Ajoy, and Westneat}
+(\protect\hyperlink{ref-Ding2021}{2021}), which do not effectively
+disentangle phenotypic variation in raw measurements due to personality,
+plasticity, and predictability. This multi-response GLMM thus provides a
+flexible and intuitive means of integrating the benefits and overcoming
+the limitations of multiple previously suggested statistical approaches.
+
+When this quadratic regression model effectively approximates the
+individual selection surface (\protect\hyperlink{ref-Lande1983}{Lande
+and Arnold 1983}; \protect\hyperlink{ref-Phillips1989}{Phillips and
+Arnold 1989}),
 \(\boldsymbol{\upbeta}=\left[\beta_1,\beta_2,\beta_3 \right]\) indicates
 the expected direction and magnitude of unconstrained adaptation in the
 average population RN values, which are also known as directional
@@ -1489,6 +1527,11 @@ Animal Personality Variation in Ecology and Evolution.''}
 Darwin, C. 1859. \emph{On the Origin of Species by Means of Natural
 Selection}. London, UK: J. Murray.
 
+\leavevmode\hypertarget{ref-Ding2021}{}%
+Dingemanse, N. J., Y. G. Araya‐Ajoy, and D. F. Westneat. 2021. {``Most
+Published Selection Gradients Are Underestimated: Why This Is and How to
+Fix It.''} \emph{Evolution} Early View.
+
 \leavevmode\hypertarget{ref-DingDocht2013}{}%
 Dingemanse, N. J., and N. A. Dochtermann. 2013. {``Quantifying
 Individual Variation in Behaviour: Mixed‐effect Modelling Approaches.''}
@@ -1685,6 +1728,11 @@ Regression-Based Methods for the Analysis of Natural Selection.''}
 Nakagawa, S., and H. Schielzeth. 2010. {``Repeatability for Gaussian and
 Non‐gaussian Data: A Practical Guide for Biologists.''} \emph{Biological
 Reviews} 85: 935--56.
+
+\leavevmode\hypertarget{ref-Nelder1972}{}%
+Nelder, J. A., and R. W. Wedderburn. 1972. {``Generalized Linear
+Models.''} \emph{Journal of the Royal Statistical Society: Series A}
+135: 370--84.
 
 \leavevmode\hypertarget{ref-Nettle2010}{}%
 Nettle, D., and L. Penke. 2010. {``Personality: Bridging the Literatures

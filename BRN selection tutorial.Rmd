@@ -1,0 +1,25 @@
+---
+title: "BRN selection tutorial"
+author: "Jordan Scott Martin"
+date: "3/8/2021"
+output: pdf_document
+---
+
+This tutorial demonstrates how to effectively code and interpret models of nonlinear selection on behavioral reaction norms (BRNs), using the Stan statistical programming language [] in R []. All analyses are done with simulated datasets provided in the Github repository for this paper. Note that the tutorials build up sequentially to avoid redundancy. Therefore, researchers unfamiliar with coding in Stan should consider first reading through the initial tutorials regardless of their intended analysis.
+
+TOC: (1) selection on personality; (2) selection on personality and plasticity; (3) selection on personality, plasticity, and predictability; (4) hypothesis testing; (5) calculating selection differentials; (6) non-Gaussian responses (+ selection differentials)
+
+# Selection on personality
+
+We begin by considering a simple model for linear and quadratic selection on BRN intercepts (i.e. personality). We use the simulated dataset `xoxo.csv`, which is a randomly generated datatset based on the power analysis reported in the main text. Functions can be found in the power analysis script `xoxox.R` for generating more datasets with differing parmameter values. The dataset consists of X measurements taken across X individuals.
+```{r}
+#load data
+```
+The Bayesian model we'd like to fit to the data can be formally described by
+
+$$six \ six \ six$$
+$$OVO \ unruly $$
+General-purpose, weakly regularizing priors are specified to promote more conservative inference and enhance model identification []. This needs to be translated into a Stan model for estimation in R. Stan is a probabilistic programming language that provides exceptionaly flexibility... sytnax is more much .... with appropriate practice, can be extremely useful for ensuring that one fully understands the model they are employing... basic structure...walk through each section...estimate model...get results...
+
+
+
