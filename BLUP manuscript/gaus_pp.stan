@@ -10,7 +10,7 @@ parameters {
   //fixed population effects
   real mu_0z; //z population intercept
   real beta_1z; //z population slope
-  real theta_0z; //z population dispersion
+  real<lower=0> theta_0z; //z population dispersion
   real mu_0; //w population intercept
   vector[5] betas; //fitness regression coefficients
   
@@ -28,22 +28,19 @@ model{
   //separate RN parameters
   vector[I] zp_mu = col(zp,1); //personality
   vector[I] zp_beta = col(zp,2); //plasticity
-  //vector[I] zp_theta = col(zp,3); //predictability
   
   //initialize vectors for response models
   vector[N] z_eta; //linear predictor of behavior expectation
-  //vector[N] z_theta; //linear predictor of behavior dispersion
   vector[I] w_eta; //linear predictor of fitness expectation
 
   //behavioral RN response model
   z_eta = mu_0z + zp_mu[ind] + (beta_1z + zp_beta[ind]).*x ;
-  //z_theta = exp(theta_0z + zp_theta[ind]) ;
   z ~ normal(z_eta, theta_0z);
     
   //fitness response model
-  w_eta = mu_0 + betas[1]*zp_mu + betas[2]*zp_beta + //betas[3]*zp_theta +
-                 betas[3]*(zp_mu .*zp_mu) + betas[4]*(zp_beta .*zp_beta) + //betas[6]*(zp_theta .*zp_theta) +   
-                 betas[5]*(zp_mu .*zp_beta); //+ betas[8]*(zp_mu .*zp_theta) + betas[9]*(zp_beta .*zp_theta) ;
+  w_eta = mu_0 + betas[1]*zp_mu + betas[2]*zp_beta + 
+                 betas[3]*(zp_mu .*zp_mu) + betas[4]*(zp_beta .*zp_beta)  + 
+                 betas[5]*(zp_mu .*zp_beta);
   w ~ normal(w_eta, theta_0);
 
   //model priors
@@ -60,11 +57,4 @@ model{
   to_vector(std_dev) ~ std_normal();
   theta_0 ~ exponential(1);
   theta_0z ~ normal(0,1);
-}
-
-generated quantities{
-matrix[3,3] R = LP * LP'; //RN correlation matrix
-matrix[3,3] S = diag_matrix(sd_P); //RN correlation matrix
-matrix[3,3] P = S*R*S; //RN covariance
-vector<lower=0>[3] V_P = sd_P .* sd_P; //RN variances
 }

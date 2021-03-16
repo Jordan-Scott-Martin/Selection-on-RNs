@@ -14,8 +14,8 @@
 \usepackage{lipsum}
 \usepackage{graphicx}
 
-\title{Estimating (Non)linear Selection on \linebreak Behavioral
-Reaction Norms}
+\title{Estimating Nonlinear Selection on \linebreak Behavioral Reaction
+Norms}
 
 \author{
     Jordan S. Martin
@@ -83,17 +83,17 @@ for modelling reaction norm effects with nonlinear structure, such as
 stabilizing, disruptive, balancing, and/or correlational selection,
 which are necessary for testing adaptive theory of individual variation.
 To address this issue, a solution is presented for straightforward and
-unbiased estimation of nonlinear reaction norm effects on fitness or any
-other outcome of interest, for Gaussian and non-Gaussian measurements.
-This solution involves specifying BLUPs as both random and fixed effects
-in a single Bayesian multi-response model. By simultaneously accounting
-for uncertainty in BLUPs and their causal effects on other measures, the
-risks accompanying classical approaches can be effectively avoided. A
-novel method for visualizing multivariate selection with such models is
-also proposed. Simulations are then used to assess the properties of
-these models under realistic empirical scenarios. Coding tutorials are
-additionally provided to aid researchers in applying this method to
-their own datasets in R.
+unbiased estimation of linear and nonlinear reaction norm effects on
+fitness for Gaussian and non-Gaussian measurements. This solution
+involves specifying BLUPs as both random and fixed effects in a single
+Bayesian multi-response model. By simultaneously accounting for
+uncertainty in reaction norm parameters and their causal effects on
+other measures, the risks accompanying classical approaches to BLUPs can
+be effectively avoided. A novel method for visualizing multivariate
+selection with such models is also proposed. Simulations are then used
+to assess the properties of these models under realistic empirical
+scenarios. Coding tutorials are additionally provided to aid researchers
+in applying this method to their own datasets in R.
 \end{abstract}
 
 \keywords{
@@ -411,15 +411,14 @@ product values of raw measurements as additional responses with
 covarying random effects, which can subsequently be used to calculate
 nonlinear selection gradients
 (\protect\hyperlink{ref-Ding2021}{Dingemanse, Araya‐Ajoy, and Westneat
-2021}). However, this approach confounds the fitness effects of
-personality, plasticity, and predictability, can be biased by unbalanced
-sampling, and does not appropriately partition nonlinear patterns of
-between- and within-individual (co)variation in non-Gaussian
-measurements. To appropriately calculate nonlinear selection gradients
-for non-Gaussian responses, expected trait values should be first
-estimated on a latent linear scale, through the use of an appropriate
-GLMM link function, before being squared or multiplied together. This
-ensures that appropriate nonlinear mean and variance effects are
+2021}). However, this approach does not differentiate between the
+fitness effects of personality, plasticity, and predictability, and it
+does not appropriately partition between- and within-individual
+(co)variation in non-Gaussian measurements. To calculate nonlinear
+selection gradients for non-Gaussian responses, expected trait values
+should be first estimated on a latent linear scale, through the use of
+an appropriate GLMM link function, before being squared or multiplied
+together. This ensures that nonlinear mean and variance effects are
 correctly predicted on the original data scale
 (\protect\hyperlink{ref-Nelder1972}{Nelder and Wedderburn 1972}).
 
@@ -460,7 +459,7 @@ coefficients on raw trait values with repeatability estimates, rather
 than directly using BLUPs in the fitness model
 (\protect\hyperlink{ref-Ding2021}{Dingemanse, Araya‐Ajoy, and Westneat
 2021}). However, this approach does not provide a means of
-differentiating (non)linear selection on personality, plasticity and
+differentiating nonlinear selection on personality, plasticity and
 predictability, nor does it generalize to non-Gaussian measurements
 where repeatability is best expressed on a transformed linear scale due
 to non-linear mean and variance effects on the original scale.
@@ -644,10 +643,10 @@ fitness from all other sources of non-repeatable variation in the raw
 trait values. The proposed model can also be conceptualized as an
 extension of the so-called `errors-in-variables' models discussed by
 \protect\hyperlink{ref-Ding2021}{Dingemanse, Araya‐Ajoy, and Westneat}
-(\protect\hyperlink{ref-Ding2021}{2021}), which do not effectively
-disentangle phenotypic variation in raw measurements due to personality,
-plasticity, and predictability. This multi-response GLMM thus provides a
-flexible and intuitive means of integrating the benefits and overcoming
+(\protect\hyperlink{ref-Ding2021}{2021}), which do not disentangle
+repeatable variation in raw measurements due to personality, plasticity,
+and predictability. This multi-response GLMM thus provides a flexible
+and intuitive means of integrating the benefits as well as overcoming
 the limitations of multiple previously suggested statistical approaches.
 
 When this quadratic regression model effectively approximates the
@@ -1130,9 +1129,9 @@ $\boldsymbol{Right \ panel}$: The expected change in the shape of the population
 \section{Simulation study of the proposed
 models}\label{simulation-study-of-the-proposed-models}}
 
-\hypertarget{simulation-based-calibration}{%
-\subsection{Simulation-based
-calibration}\label{simulation-based-calibration}}
+\hypertarget{simulation-based-calibration-of-proposed-models}{%
+\subsection{Simulation-based calibration of proposed
+models}\label{simulation-based-calibration-of-proposed-models}}
 
 Simulations were used to explore the statistical properties of the
 proposed multi-response models. Two approaches were used to assess
@@ -1192,31 +1191,16 @@ of power analyses for detecting the presence of directional selection
 coefficients across varying degrees of model complexity at reasonable
 sample sizes for long-term field studies. In particular, I considered
 study designs varying in sample size (\(I = 100, 300, 500\)) and
-repeated measures of behavior (\(I_{N} = 3,6,9\)), assuming in all cases
+repeated measures of behavior (\(I_{N} = 3,6\)), assuming in all cases
 that a single fitness measure was taken at the end of the study period.
 Effect sizes were fixed to \(\beta = \pm 0.3\),
 \(\mathrm{SD(}{\theta_0})=\sqrt{0.5}\),
 \(\mathrm{diag({\boldsymbol{S}}})=\sqrt{0.3}\), and
 \(\mathrm{\boldsymbol{R}}_{m \neq n}=\pm 0.3\) for all models. Given
 that many researchers may be primarily interested in a subset of RN
-parameters, I first considered models with selection on (i) personality,
-(ii) personality and plasticity, and (iii) personality, plasticity, and
-predictability. I then considered performance for (iv) a more complex
-structural equation model in which variation in RN intercepts, slopes,
-and dispersion across three distinct behaviors were caused by a single
-underlying dimension of generalized personality, plasticity, and
-predictability, such that individuals higher in this latent trait value
-were simultaneously higher in personality and predictability and lower
-in plasticity across all three behaviors (and vice versa). Such
-generalized dimensions are expected to more accurately represent
-selection when many partially redundant measures of a behavioral
-character are used to estimate RN parameters, such as when measuring
-aggression or sociability with many specific behavioral indicators in an
-experimental or observational context (e.g.~pecking, l\ldots, et ;
-contact sitting, allogrooming, and proximity to conspecifics; XX). See
-\textbf{Figure \ref{fig:fig3}} for path diagrams of each model. Coding
-tutorials for estimating each of these models is provided in the
-\textbf{ESM}.
+parameters, I first considered models with nonlinear selection on (i)
+personality, (ii) personality and plasticity, and (iii) personality,
+plasticity, and predictability.
 
 In general, it is expected that GLMMs appropriate for describing
 non-Gaussian data types will provide more power as compared to LMMs for

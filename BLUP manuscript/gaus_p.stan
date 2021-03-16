@@ -10,9 +10,9 @@ parameters {
   //fixed population effects
   real mu_0z; //z population intercept
   real beta_1z; //z population slope
-  real theta_0z; //z population dispersion
+  real<lower=0> theta_0z; //z population dispersion
   real mu_0; //w population intercept
-  vector[3] betas; //fitness regression coefficients
+  vector[2] betas; //fitness regression coefficients
   
   //random effects (standard deviations)
   real<lower=0> sd_P; //RN parameter sds

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2021.3.3)  10 MAR 2021 02:01
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2021.3.10)  15 MAR 2021 13:08
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -352,11 +352,11 @@ File: l3backend-pdftex.def 2021-03-02 L3 backend support: PDF output (pdfTeX)
 /xparse-2020-10-01.sty
 (c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/l3packages/xparse
 /xparse-generic.tex)))
-Package: lipsum 2019/01/02 v2.2 150 paragraphs of Lorem Ipsum dummy text
+Package: lipsum 2021-03-03 v2.3 150 paragraphs of Lorem Ipsum dummy text
 
 (c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lipsum/lipsum.ltd
 .tex
-File: lipsum.ltd.tex 2019/01/02 v2.2 The Lorem ipsum dummy text
+File: lipsum.ltd.tex 2021-03-03 v2.3 The Lorem ipsum dummy text
 ))
 (c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics/graphicx
 .sty
@@ -795,25 +795,25 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 <fig2.pdf, id=290, 794.97pt x 505.89pt>
 File: fig2.pdf Graphic file (type pdf)
 <use fig2.pdf>
-Package pdftex.def Info: fig2.pdf  used on input line 470.
+Package pdftex.def Info: fig2.pdf  used on input line 469.
 (pdftex.def)             Requested size: 556.4752pt x 354.12057pt.
 
-Overfull \hbox (39.15012pt too wide) in paragraph at lines 469--474
+Overfull \hbox (39.15012pt too wide) in paragraph at lines 468--473
 []|  [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 474--474
+Underfull \hbox (badness 10000) in paragraph at lines 473--473
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 474--474
+Underfull \hbox (badness 10000) in paragraph at lines 473--473
 
  []
 
 
-Underfull \hbox (badness 1072) in paragraph at lines 474--474
+Underfull \hbox (badness 1072) in paragraph at lines 473--473
 []$\T1/lmr/m/n/10 (+20) . Pat-terns of non-lin-ear se-lec-tion on two be-hav-io
 ral RN pa-ram-e-ters $[]$ and $[]$.
  []
@@ -825,19 +825,19 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 fier (name{equation.3.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.609 \begin{equation}
+l.608 \begin{equation}
                        \tag{1.2}\label{eq:1.2}pdfTeX warning (ext4): destinatio
 n with the same identifier (name{equation.3.1}) has been already used, duplicat
 e ignored
 <to be read again> 
                    \relax 
-l.673 \begin{equation}
+l.672 \begin{equation}
                        \tag{1.3}\label{eq:1.3} [8] [9]pdfTeX warning (ext4): de
 stination with the same identifier (name{equation.3.1}) has been already used, 
 duplicate ignored
 <to be read again> 
                    \relax 
-l.881 \begin{equation}
+l.880 \begin{equation}
                        \tag{2}\label{eq:2}
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
@@ -845,19 +845,19 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 3.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.921 \begin{equation}
+l.920 \begin{equation}
                        \tag{3}\label{eq:3}pdfTeX warning (ext4): destination wi
 th the same identifier (name{equation.3.1}) has been already used, duplicate ig
 nored
 <to be read again> 
                    \relax 
-l.951 \begin{equation}
+l.950 \begin{equation}
                        \tag{4.1}\label{eq:4.1}pdfTeX warning (ext4): destinatio
 n with the same identifier (name{equation.3.1}) has been already used, duplicat
 e ignored
 <to be read again> 
                    \relax 
-l.964 variances. \begin{equation}
+l.963 variances. \begin{equation}
                                   \tag{4.2}\label{eq:4.2} [11]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
@@ -865,25 +865,25 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 <fig3_2.pdf, id=479, 722.7pt x 505.89pt>
 File: fig3_2.pdf Graphic file (type pdf)
 <use fig3_2.pdf>
-Package pdftex.def Info: fig3_2.pdf  used on input line 1121.
+Package pdftex.def Info: fig3_2.pdf  used on input line 1120.
 (pdftex.def)             Requested size: 527.5666pt x 369.29662pt.
 
-Overfull \hbox (14.50925pt too wide) in paragraph at lines 1120--1125
+Overfull \hbox (14.50925pt too wide) in paragraph at lines 1119--1124
 []|  [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1125--1125
+Underfull \hbox (badness 10000) in paragraph at lines 1124--1124
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1125--1125
+Underfull \hbox (badness 10000) in paragraph at lines 1124--1124
 
  []
 
 
-LaTeX Warning: Float too large for page by 13.63313pt on input line 1127.
+LaTeX Warning: Float too large for page by 13.63313pt on input line 1126.
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -910,14 +910,14 @@ No file BLUP-manuscript-alt.bbl.
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `BLUP-manuscript-alt.out' has not changed.
-(rerunfilecheck)             Checksum: E5111004994A1CDCA3996B46E79053F9;4139.
+(rerunfilecheck)             Checksum: AC2A1BDE892747E911B3AAEF064C0812;4243.
  ) 
 Here is how much of TeX's memory you used:
- 14078 strings out of 480971
- 225663 string characters out of 5906169
- 699736 words of memory out of 5000000
- 30643 multiletter control sequences out of 15000+600000
- 475180 words of font info for 179 fonts, out of 8000000 for 9000
+ 14075 strings out of 480971
+ 225671 string characters out of 5906168
+ 697770 words of memory out of 5000000
+ 30644 multiletter control sequences out of 15000+600000
+ 475003 words of font info for 177 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  83i,16n,88p,3259b,427s stack positions out of 5000i,500n,10000p,200000b,80000s
 {c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.
@@ -948,10 +948,10 @@ mar/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy5.pfb><c:/User
 s/jormar/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb><c:
 /Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.p
 fb>
-Output written on BLUP-manuscript-alt.pdf (21 pages, 580841 bytes).
+Output written on BLUP-manuscript-alt.pdf (21 pages, 579835 bytes).
 PDF statistics:
- 738 PDF objects out of 1000 (max. 8388607)
- 682 compressed objects within 7 object streams
+ 737 PDF objects out of 1000 (max. 8388607)
+ 681 compressed objects within 7 object streams
  170 named destinations out of 1000 (max. 500000)
  35504 words of extra memory for PDF output out of 35830 (max. 10000000)
 

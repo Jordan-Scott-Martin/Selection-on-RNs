@@ -1,25 +1,475 @@
 ---
-title: "BRN selection tutorial"
+title: "Estimating Nonlinear Selection on Behavioral Reaction Norms"
+subtitle: "Tutorials in Stan"
 author: "Jordan Scott Martin"
 date: "3/8/2021"
-output: pdf_document
+output: 
+  pdf_document:
+    highlight: kate
+
+biblio-style: unsrt
+bibliography: mybibfile.bib
+toc: TRUE
+
+header-includes:
+- \usepackage{amsmath, xparse, mathtools, upgreek}
+- \usepackage{lineno}
+- \linenumbers
+- \usepackage{hyperref}
+- \usepackage[labelfont=bf]{caption}
+- \hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    filecolor=black,
+    urlcolor=black}
+
 ---
 
-This tutorial demonstrates how to effectively code and interpret models of nonlinear selection on behavioral reaction norms (BRNs), using the Stan statistical programming language [] in R []. All analyses are done with simulated datasets provided in the Github repository for this paper. Note that the tutorials build up sequentially to avoid redundancy. Therefore, researchers unfamiliar with coding in Stan should consider first reading through the initial tutorials regardless of their intended analysis.
+# Introduction
 
-TOC: (1) selection on personality; (2) selection on personality and plasticity; (3) selection on personality, plasticity, and predictability; (4) hypothesis testing; (5) calculating selection differentials; (6) non-Gaussian responses (+ selection differentials)
-
-# Selection on personality
-
-We begin by considering a simple model for linear and quadratic selection on BRN intercepts (i.e. personality). We use the simulated dataset `xoxo.csv`, which is a randomly generated datatset based on the power analysis reported in the main text. Functions can be found in the power analysis script `xoxox.R` for generating more datasets with differing parmameter values. The dataset consists of X measurements taken across X individuals.
+This series of tutorials demonstrates how to effectively code and interpret models of nonlinear selection on behavioral reaction norms (RNs), using the Stan statistical programming language [@Stan] in R [@Rbase]. Stan is an open-source programming language for estimating probabilistic models of arbitrary complexity using fully Bayesian inference with state-of-the-art Markov Chain Monte Carlo (MCMC) sampling techniques [@Hoffman2014]. Stan interfaces with R through the RStan package [@Stan], but you will first need to install Stan on your computer and ensure that it is appropriately configured with your C++ toolchain. This can be accomplished by following the instructions for your operating system on the [RStan Getting Started](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started) page. Once you are able to effectively use RStan, you can begin creating the `.stan` files necessary for estimating models. These files can be composed using RStudio or any text editor. A file can be also be composed directly in R
+\linebreak
 ```{r}
-#load data
+write("// for Stan comments
+    functions{...} // Stan models are composed of
+    data {...} // multiple programming blocks
+    transformed data {...} //only data, parameters, and model
+    parameters {...} //blocks are necessary
+    transformed parameters {...}
+    model {...}
+    generated quantities {...} ",
+  "mod1.stan")
+
 ```
-The Bayesian model we'd like to fit to the data can be formally described by
 
-$$six \ six \ six$$
-$$OVO \ unruly $$
-General-purpose, weakly regularizing priors are specified to promote more conservative inference and enhance model identification []. This needs to be translated into a Stan model for estimation in R. Stan is a probabilistic programming language that provides exceptionaly flexibility... sytnax is more much .... with appropriate practice, can be extremely useful for ensuring that one fully understands the model they are employing... basic structure...walk through each section...estimate model...get results...
+Once an appropriate `.stan` file is prepared, it can be compiled with R for the C++ toolchain using the `stan_model()` function and subsequently estimated with an appropriate list of empirical data using the `sampling()` function. The resulting posteriors of a model can then be accessed with the `extract()` function and manipulated for any further quantities or analyses of interest.
+\linebreak
+```{r eval=FALSE}
+#load package
+library(rstan)
+
+#compiles the model in C++ for MCMC estimation
+mod1 = stan_model("mod1.stan")
+
+#samples posterior distribution of the model with default MCMC settings
+results = sampling(object = mod1, data = data)
+
+#extracts posterior estimates
+samples =  extract(results)
+
+```
+
+This series is currently under development and will continue to be extended in the coming months to cover a variety of additional modeling scenarios. For now, a full Gaussian model is presented to provide a general introduction to the proposed approach.
+
+# Full Gaussian model
+
+## Formal model
+
+It's always helpful to write out the formal model we'd like to estimate in Stan before attempting to code it. There are a few reasons for this. Firstly, Stan is a probabilistic programming language and, as such, facilitates coding of formal probabilistic models through direct specification of model parameters and likelihood functions. Therefore, some understanding of the formal structure of any model is necessary to code in Stan. Gaining a deeper understanding of formal statistical models can also be extremely valuable for building researchers' autonomy and ingenuity in data analysis, which opens up the door to developing novel models capturing the most salient features of one's specific empirical system and dataset, rather than pigeonholing things into prepackaged toolkits that may require some undesirable assumptions or simplifications. Researchers unfamiliar with formal statistical models are encouraged to see @Rethinking for detailed explanation and examples.
 
 
+A Gaussian model of selection on a full behavioral reaction norm, i.e. with parameters personality, plasticity, and predictability, can be given by
 
+\begin{equation} \notag\label{}
+\begin{gathered}[t]
+z_{ij} \sim \mathrm{Normal} \left(\mu^{(z)}_{ij }, \sigma^{(z)}_{ij} \right)  \\
+ \mu^{(z)}_{ij} = \mu_0^{(z)} + \mu_j^{(z)}+ \left(\beta_1^{(z)} + \beta_j^{(z)} \right) x_{ij} \nonumber \\
+\mathrm{log} \left( \sigma^{(z)}_{ij} \right) = \theta_0^{(z)} + \theta_{j}^{(z)} \nonumber \\
+\boldsymbol{z_{\mathrm{p}}} = \begin{bmatrix}
+\boldsymbol{\mu}^{(z)} &
+\boldsymbol{\beta}^{(z)} &
+\boldsymbol{\theta}^{(z)} \end{bmatrix} ^{\prime}
+ \sim \mathrm{M}\mathrm{VNormal} \left(
+\boldsymbol{0},\boldsymbol{\mathrm{S}}\boldsymbol{\mathrm{R}}\boldsymbol{\mathrm{S}} \right) \nonumber \\ 
+\nonumber \\
+w_{j} \sim \mathrm{Normal} \left( \mu_{j}, \sigma _{j} \right) \nonumber \\
+\mu _{j} = \mu_0 + \beta_1 \left( \mu^{(z)}_{j} \right) + 
+                \beta_2 \left( \beta_j^{(z)} \right) + 
+                \beta_3 \left( \theta^{(z)}_{j} \right)  \nonumber  \\ 
+                + \beta_4 \left( \mu^{(z)}_j \mu^{(z)}_j \right) +
+                \beta_5\left( \beta^{(z)}_j \beta^{(z)}_j \right) +
+                \beta_6 \left( \theta^{(z)}_j \theta^{(z)}_j \right)\\ 
+                +  \beta_7 \left( \mu^{(z)}_j \beta^{(z)}_j \right) + 
+                \beta_8 \left( \mu^{(z)}_j \theta^{(z)}_j \right) + 
+                 \beta_9 \left( \beta^{(z)}_j \theta^{(z)}_j \right) \nonumber \\ \nonumber \\ 
+\mu_0^{(z)}, \beta_1^{(z)}, \theta_0^{(z)},\mu_0, \beta_1, ... , \beta_9 \sim \mathrm{Normal}(0,1) \nonumber \\
+\boldsymbol{\mathrm{S}},\sigma \sim \mathrm{Exponential}(1) \nonumber \\
+\boldsymbol{\mathrm{R}} \sim \mathrm{LKJ}(2) \nonumber \\
+\end{gathered}
+\end{equation}
+
+Notation follows @Martin2021a, where this model is explained and justified in greater detail. The individual-specific RN parameter values of behavior $\boldsymbol{z}$ for all individuals are contained in the BLUP vector $\boldsymbol{z_{\mathrm{p}}}$ and the selection effects are described by the regression coefficients $\beta_1,...,\beta_9$ on fitness measure $\boldsymbol{w}$. For this tutorial, we use general-purpose, weakly regularizing priors on model parameters to promote more robust inference and enhance model identification [@Lemoine2019].
+
+## Simulate dataset
+With the formal model in place, we can now simulate appropriate data to use for its estimation. For computational efficiency, we assume a sample of 100 individuals with 5 repeated behavioral measures and a single fitness measure. Parameter values are arbitrarily fixed so that the population-level intercepts and slopes are 0, with 0.3 for  all regression coefficients in the fitness model and correlations among random effects, as well as residual variances of 0.5 for the behavior and fitness response models.
+\linebreak
+```{r}
+#simulation parameters
+I = 100 #number of individuals
+repm = 5 #repeated behavioral measures
+
+#fixed effects
+beta = 0.3 #regression coefficients
+popint = 0 #population behavior intercept
+popslope = 0 #population behavior slope
+
+#random effects
+sd = sqrt(0.3) #RN parameter standard deviations
+cor = 0.3 #correlations between RN parameters
+popdisp = sqrt(0.5) #residual SD of behavior
+res = sqrt(0.5) #residual SD of fitness
+```
+
+As discussed in @Martin2021a, we simulate the variance-covariance matrix $\boldsymbol{\mathrm{P}}$ of RN parameters through matrix multiplication $\boldsymbol{\mathrm{S}}\boldsymbol{\mathrm{R}}\boldsymbol{\mathrm{S}}$ of a matrix $\boldsymbol{\mathrm{S}}$ with standard deviations on the diagonal and a correlation matrix $\boldsymbol{\mathrm{R}}$.
+\linebreak
+```{r}
+#generate RN covariance matrix P
+  R = matrix(cor, nrow=3, ncol=3 )
+  R[lower.tri(R)] = t(R)[lower.tri(R)] #force symmetric
+  diag(R) = 1 #make correlation matrix
+  S = matrix( c(sd,0,0,0,sd,0,0,0,sd), nrow=3, ncol=3 ) #SD matrix
+  P = S %*% R %*% S #covariance matrix
+  
+#simulate RN parameters for individuals
+  library(mvtnorm)
+  z_p = rmvnorm(I, mean = rep(0,3), sigma = P)
+  
+#separate each parameter
+  personality = z_p[,1]
+  plasticity = z_p[,2]
+  predictability = z_p[,3]
+```  
+We then simulate a random environmental gradient across individuals, which we assume for simplicity is identically and independently distributed acros all observations
+```{r}
+  #environmental covariate (z-score)
+  x = rnorm(I*repm, 0, 1)
+```
+along with an index used to link each observation to the corresponding individual being observed.
+```{r}
+  #index of repeated individual measures
+  ind = rep(1:I, each = repm)
+```  
+The mean and standard deviations of behavior can then be used to simulate individuals' raw data.
+```{r}
+  #behavioral response model
+  z_mu = popint + personality[ind] + (popslope + plasticity[ind])*x #mean of normal dist
+  z_sigma = log(popdisp) + predictability[ind] #SD of normal dist
+  z = rnorm(I*repm, mean = z_mu, sd = exp(z_sigma) ) #observations
+```  
+The fitness model is simulated so that each individual has a single measure.
+```{r}
+  #regression coefficients
+  betas = rep(beta, 9) #naive assumption of equivalent coefficients
+
+  #fitness response model
+  w_mu = 1 + betas[1]*personality + betas[2]*plasticity + betas[3]*predictability +
+             betas[4]*(personality^2) + betas[5]*(plasticity^2) + betas[6]*(predictability^2) +
+             betas[7]*(personality*plasticity) + betas[8]*(personality*predictability) +
+             betas[9]*(plasticity*predictability)
+  w = rnorm(I, mean = w_mu, sd = res) #observations
+```
+Stan expects a list rather than dataframe of observed values for model estimation. This provides desirable flexibility because it allows for the specification of complex multi-response models with vectors of differing size, as the dimensionality of each variable in this list is declared separately in Stan.
+```{r}
+data = list(x = x, z = z, w = w, ind = ind, I = I, N = I*repm)
+lapply(data,head) #see initial entries of each list item
+```
+
+## Code model
+Stan uses its own language for writing probabilistic models, including a variety of built-in functions designed to aid in efficient computation. The biggest conceptual hurdle for new users of Stan is likely to be the absence of an intuitive R-like syntax for specifying model formulas, such as formulas like `y ~ x + (1|z)` that can be used to quickly specify complex generalized linear mixed-effects models. These formulas facilitate highly efficient statistical modeling, but do so at the cost of limiting users' ability to specify atypical model structures. Instead, Stan provides the benefit of nearly unlimited flexibility in model specification, with the added cost of a steeper learning curve. In particular, as noted above, models must be formally specified with mathematically appropriate likelihood functions, rather than this process being handled on the back-end through textual inputs from the user such as `family= poisson(link = "log")`. This may at first seem like a cumbersome task, but it affords a degree of flexibility and autonomy necessary for easily estimating the proposed models in Stan, which to the best of my knowledge cannot be accomplished with other mainstream statistical software. Nonetheless, it is important to recognize that some practice and trial-and-error will also be required to gain competency and comfortability with Stan. I therefore encourage researchers to review the [Stan Reference Manual](https://mc-stan.org/docs/2_25/reference-manual/index.html), as well the extensive collection of [Stan Case Studies](https://mc-stan.org/users/documentation/case-studies), which will provide a more robust foundation for estimating any model of interest in Stan.
+
+As mentioned above, a basic Stan model consists of multiple programming blocks that together specify the data, parameters, likelihood, and quantities of interest for a model. Rather than tackling the model in a single step, we consider the blocks in turn before putting them together in a single file.
+
+### Data
+
+The first component of a Stan model is the data block, where we'll tell the model what to expect from our data list, as well as how to treat that data inside the model.
+
+```{stan, output.var = 'foo', eval=FALSE}
+data {
+  int<lower=1> I; //total individuals
+  int<lower=1> N; //total number of observations
+  int<lower=1> ind[N]; //index of individual observations
+  vector[N] x; //environmental covariate
+  vector[N] z; //behavioral measurements
+  vector[I] w; //fitness measurements
+}
+```
+
+We first tell the model to expect integers with values greater than 1 for the total number of individuals observed `I` and the total number of observations for the repeatedly measured behavioral measure `N`. We know we only have a single fitness measure per individual, so `I` also tells us the total number of fitness observations. The next step is to specify an index for connecting repeated observations of the behavior `z` to the identity of the individual being observed. This index should be represented with integers specified according to the order of the data vectors `z` and `w`. The argument `ind[N]` tells Stan that these integer values should in total be of length `N`. If one has indexed observations in their data using character strings, they will need to first be converted to integers. For the simulated dataset, this index looks like
+
+```{r}
+head(cbind(z,ind),15)
+```
+
+The remaining arguments tell Stan to expect vectors of appropriate length for the environmental covariate `x` used to estimate plasticity, the behavioral measure `z`, and the fitness measure `w`.
+
+### Parameters
+
+The parameters block will take all of the basic parameters that are specified in the model. We begin by considering the fixed effects in the formal model, although the order of specification in the parameters block is entirely arbitrary.
+
+```{stan, output.var = 'foo', eval=FALSE}
+parameters {
+  //fixed population effects
+  real mu_0z; //z population intercept
+  real beta_1z; //z population slope
+  real theta_0z; //z population dispersion
+  real mu_0; //w population intercept
+  vector[9] betas; //fitness regression coefficients
+//...
+```
+
+ `mu_0z` is the population intercept $x$ of the linear predictor of behavior `z`, `beta_1z` is the population slope $x$, and `theta_0z` is the population intercept of the dispersion parameter $x$. For the fitness model, we specify `mu_0` for the global intercept $x$, as well as a vector `betas` containing 9 regression coefficients for each of the selection effects $\beta_1,...,\beta_9$ in the fitness model. Note that this could be equivalently specified by giving each element of this vector separately, e.g.
+```{stan, output.var = 'foo', eval=FALSE}
+  real beta_1;
+  real beta_2;
+  real beta_3;
+  real beta_4;
+//...
+```
+
+For the random effects, a slightly more complicated setup is used.
+
+```{stan, output.var = 'foo', eval=FALSE}
+//...
+  //random effects
+  real<lower=0> sigma_0; //w dispersion
+  vector<lower=0>[3] sd_zp; //RN parameter sds
+  matrix[I,3] std_dev; //individual-level RN deviations
+  cholesky_factor_corr[3] R_chol; //RN parameter correlations
+}
+```
+
+First, we specify `sigma_0` for the residual standard deviation (SD) of the linear fitness model $\sigma_0$, along with a vector `sd_zp` of length 3 for each of the SDs of the RN parameters (personality, plasticity, and predictability). The matrix $\boldsymbol{\mathrm{S}}$ in the formal model has `sd_zp` on its diagonal.  Importantly, because SD parameters by definition cannot take on values below zero, we need to specify `<lower=0>` so that the parameters do not take on values lower than 0 during model estimation. A matrix of dimensions (I x 3) is also specified for the standardized deviations of each individual's RN parameter values from the population values. As explained below, these standard normal deviates are scaled by the SDs and correlations among RN parameters to derive BLUPs of appropriate magnitude.
+
+Finally, a matrix parameter `R_chol` is specified for the RN parameter correlation matrix $\boldsymbol{\mathrm{R}}$. However, rather than using the function `corr_matrix` for a full correlation matrix, we instead use a special function `Cholesky_factor_corr` to estimate a so-called *Cholesky decomposition* of $\boldsymbol{\mathrm{R}}$. To understand why we do this, note that for any positive definite matrix $\boldsymbol{\mathrm{R}}$, a Cholesky decomposition can be defined such that $$\boldsymbol{\mathrm{R}} = \boldsymbol{\mathrm{R}}_\mathrm{L} \boldsymbol{\mathrm{R}}_\mathrm{L}^{\mathrm{T}}$$
+where $\boldsymbol{\mathrm{R}}_\mathrm{L}$ is a lower-triangular matrix and $^{\mathrm{T}}$ indicates matrix transposition. This property means that we can always estimate the model using a smaller lower-triangular matrix $\boldsymbol{\mathrm{R}}_{\mathrm{L}}$ and subsequently recover the full positive-definitive matrix $\boldsymbol{\mathrm{R}}$ by post-multiplying $\boldsymbol{\mathrm{R}}_\mathrm{L}$ with its transpose. This trick is useful for making any Stan model sample more efficiently, as computations can be done more quickly with the reduced matrix of lower dimensionality that lacks the redundant features of the full symmetric correlation matrix.
+
+### Transformed parameters
+
+With these basic parameters in place, we can also further specify parameters in the transformed parameters block that are simply combinations of the basic parameters. In this model, we specifically need derive RN parameters (BLUPs) that are appropriately scaled by the RN covariance matrix $\boldsymbol{\mathrm{P}}$ in the formal model. This is accomplished as follows
+
+```{stan, output.var = 'foo', eval=FALSE}
+transformed parameters {
+  matrix[I,3] zp; //individual phenotypic RN parameter values
+  zp =  std_dev * diag_pre_multiply(sd_zp, R_chol);
+}
+```
+
+This specification gives the appropriate BLUPs for each individual, as described in the formal model by
+$$\boldsymbol{z_{\mathrm{p}}} = \begin{bmatrix}
+\boldsymbol{\mu}^{(z)} &
+\boldsymbol{\beta}^{(z)} &
+\boldsymbol{\theta}^{(z)} \end{bmatrix} ^{\prime}
+ \sim \mathrm{M}\mathrm{VNormal} \left(
+\boldsymbol{0},\boldsymbol{\mathrm{S}}\boldsymbol{\mathrm{R}}\boldsymbol{\mathrm{S}} \right)$$
+To see how this works, note that any normally distributed random variable $\boldsymbol{z}$
+$$\boldsymbol{z} \sim \mathrm{Normal}(0,\sigma_z)$$
+can also be expressed as a standard normal variable $z_{std}$ scaled by the original SD
+$$\boldsymbol{z} \equiv \boldsymbol{z_{\mathrm{std}}}\sigma_z$$
+$$\boldsymbol{z_{\mathrm{std}}} \sim \mathrm{Normal}(0,1)$$
+Similarly for an *I* x *p* matrix $\boldsymbol{Z}$ of *p* phenotypes where
+$$\boldsymbol{Z} \sim \mathrm{MVNormal}(\boldsymbol{0},\boldsymbol{\mathrm{P}}) $$
+we can derive the appropriately scaled values with a matrix of standard normals $\boldsymbol{Z_{\mathrm{std}}}$ and a Cholesky decomposition of $\boldsymbol{\mathrm{P}}$, so that
+$$\boldsymbol{Z} \equiv   \boldsymbol{Z_{\mathrm{std}}} \boldsymbol{\mathrm{P}}_{\mathrm{L}}$$
+$$\boldsymbol{\mathrm{P}}_{\mathrm{L}} = \mathrm{Chol}(\boldsymbol{\mathrm{P}})=
+\mathrm{Chol}(\boldsymbol{\mathrm{S}}\boldsymbol{\mathrm{R}}\boldsymbol{\mathrm{S}})=\boldsymbol{\mathrm{S}}\boldsymbol{\mathrm{R}}_{\mathrm{L}}$$
+
+In this case, $\boldsymbol{Z_{\mathrm{std}}}$ corresponds to `std_dev` and the function `diag_pre_multiply()` first creates a matrix with `sd_zp` on the diagonal, i.e. $\boldsymbol{\mathrm{S}}$, and then multiplies it with the lower Cholesky matrix `R_chol` representing $\boldsymbol{\mathrm{R}}_{\mathrm{L}}$. Although this so-called *non-centered parameterization* may seem like a lot of unnecessary work, separating out the scale and associations of the random effects in this way will often lead to better model convergence and thus more efficient model estimation. Therefore, these mathematically equivalent reparameterizations of the formal model are generally worth implementing although not strictly necessary.
+
+### Model
+
+The model block contains the likelihood functions of the model, the priors for the basic parameters, as well as any data structures that one may want to create for pragmatic convenience in specifying the model but not save in the output (e.g. to reduce memory usage). We can again work through each section these sections in turn.
+
+```{stan, output.var = 'foo', eval=FALSE}
+model{
+  //separate RN parameters
+  vector[I] zp_mu = col(zp,1); //personality
+  vector[I] zp_beta = col(zp,2); //plasticity
+  vector[I] zp_theta = col(zp,3); //predictability
+  
+  //initialize vectors for response models
+  vector[N] z_mu; //linear predictor of behavior expectation
+  vector[N] z_sigma; //linear predictor of behavior dispersion
+  vector[I] w_eta; //linear predictor of fitness expectation
+//...
+```
+
+In this first step, we specify a few new vectors to separate out each RN parameter from the matrix `zp` created in the transformed parameters block. This is not strictly necessary, but avoids clutter in the model likelihood caused by repeatedly subsetting the matrix for the respective columns `col(zp,1)`, `col(zp,2)`, and `col(zp,3)`. Similarly, to tidy up the model likelihood, we create new vectors to hold the linear predictors of each behavioral and fitness observation. Note that there is no need to create a linear predictor for the dispersion of fitness, as nothing is predicting the residual SD of the fitness model, which is already taken care of by the `sigma_0` parameter.
+
+The next step is then to fill in these vectors. For the response model of behavior `z`
+
+```{stan, output.var = 'foo', eval=FALSE}
+//...
+  //behavioral RN response model
+  z_mu = mu_0z + zp_mu[ind] + (beta_1z + zp_beta[ind]).*x ;
+  z_sigma = exp(theta_0z + zp_theta[ind]) ;
+  z ~ normal(z_mu, z_sigma);
+```
+
+The final line tells Stan that the observed values `z` were generated by a Normal distribution with a likelihood function described by the expected means `z_mu` and standard deviations `z_sigma` of each observation. Note that `z_sigma` is calculated with the exponential function `exp()` because the formal model is specified with a log link function, so that the inverse exponential link function is applied to the linear predictor in order return estimates on the appropriate scale, i.e. if $\mathrm{log}(\sigma)=\theta$ then $\mathrm{exp}(\theta)=\sigma$. The operator `.*` indicates element-wise multiplication of vectors, which in this case multiplies the slopes `beta_1z + zp_beta[ind]` by the observed environmental gradient $x$. These three lines of code are therefore equivalent to 
+\begin{equation} \notag\label{}
+\begin{gathered}[t]
+z_{ij} \sim \mathrm{Normal} \left(\mu^{(z)}_{ij }, \sigma^{(z)}_{ij} \right)  \\
+ \mu^{(z)}_{ij} = \mu_0^{(z)} + \mu_j^{(z)}+ \left(\beta_1^{(z)} + \beta_j^{(z)} \right) x_{ij} \nonumber \\
+\mathrm{log} \left( \sigma^{(z)}_{ij} \right) = \theta_0^{(z)} + \theta_{j}^{(z)} \nonumber \\
+\end{gathered}
+\end{equation}
+
+The index `ind` is here used to appropriately repeat the random effect values of each RN parameter across repeated observations of the behavior. For example, if the first four observations are for individual 1, so that `ind`={1,1,1,1,2,...}, then `zp_mu[ind]` will repeat the first value of `zp_mu` for the first four observations. This is why it is essentially to correctly match the order of the index and the response vectors.
+
+The fitness model can also be specified accordingly
+
+```{stan, output.var = 'foo', eval=FALSE}
+//...    
+  //fitness response model
+  w_eta = mu_0 + betas[1]*zp_mu + betas[2]*zp_beta + betas[3]*zp_theta +
+                 betas[4]*(zp_mu .*zp_mu) + betas[5]*(zp_beta .*zp_beta) +
+                 betas[6]*(zp_theta .*zp_theta) +   
+                 betas[7]*(zp_mu .*zp_beta) + betas[8]*(zp_mu .*zp_theta) + 
+                 betas[9]*(zp_beta .*zp_theta) ;
+  w ~ normal(w_eta, sigma_0);
+```
+
+There is no need for the `ind` index here because each individual's fitness is only observed once. The final necessary step is to introduce priors for all basic parameters listed in the parameters block.
+
+```{stan, output.var = 'foo', eval=FALSE}
+//...   
+  //model priors
+  
+  //fixed effects
+  mu_0z ~ normal(0,1);
+  beta_1z ~ normal(0,1);
+  theta_0z ~ normal(0,1);
+  mu_0 ~ normal(0,1);
+  betas ~ normal(0,1); 
+  
+  //random effects
+  sd_zp ~ exponential(1);
+  R_chol ~ lkj_corr_cholesky(2);
+  to_vector(std_dev) ~ std_normal();
+  sigma_0 ~ exponential(1);
+}
+```
+
+For the matrix of standard normal RN parameter deviations `std_dev`, we should always specify that the vector of all elements in this matrix are described by a `std_normal()` distribution, which is necessary for the non-centered parameterization introduced in the transformed parameters block. The other parameters can be given whatever priors are intended for the analysis, which in this case are the weakly regularizing priors used in the formal model, i.e.
+$$\mu_0^{(z)}, \beta_1^{(z)}, \theta_0^{(z)},\mu_0, \beta_1, ... , \beta_9 \sim \mathrm{Normal}(0,1)$$
+$$\boldsymbol{\mathrm{S}},\sigma \sim \mathrm{Exponential}(1)$$
+$$\boldsymbol{\mathrm{R}} \sim \mathrm{LKJ}(2) \nonumber$$
+
+### Generated quantities
+
+The final programming block in our Stan model concerns the calculation of any quantities of interest which weren't directly estimated in earlier blocks.
+
+```{stan, output.var = 'foo', eval=FALSE}
+generated quantities{
+matrix[3,3] R = R_chol * R_chol'; //RN correlation matrix
+matrix[3,3] S = diag_matrix(sd_zp); //RN correlation matrix
+matrix[3,3] P = S*R*S; //RN covariance
+vector<lower=0>[3] V_P = sd_zp .* sd_zp; //RN variances
+}
+```
+
+We derive the full correlation matrix $\boldsymbol{\mathrm{R}}$ by multiplying the Cholesky matrix $\boldsymbol{\mathrm{R}}_\mathrm{L}$ used for model estimation with its transpose, accomplished with the transpose operator `'`. The covariance matrix $\boldsymbol{\mathrm{P}}$ is derived by multiplying the full correlation and standard deviation matrices $\boldsymbol{\mathrm{S}}\boldsymbol{\mathrm{R}}\boldsymbol{\mathrm{S}}$ , and the variances of the RN parameters are derived by squaring the SDs in `sd_zp`.
+
+### Final model code
+
+With each programming block coded, we can put them all together and write to a single `.stan` file in R
+
+```{r}
+write("
+data {
+  int<lower=1> I; //total individuals
+  int<lower=1> N; //total number of observations
+  int<lower=1> ind[N]; //index of individual observations
+  vector[N] x; //environmental covariate
+  vector[N] z; //behavioral measurements
+  vector[I] w; //fitness measurements
+}
+parameters {
+  //fixed population effects
+  real mu_0z; //z population intercept
+  real beta_1z; //z population slope
+  real theta_0z; //z population dispersion
+  real mu_0; //w population intercept
+  vector[9] betas; //fitness regression coefficients
+  
+  //random effects
+  real<lower=0> sigma_0; //w dispersion (sigma for Gaussian)
+  vector<lower=0>[3] sd_zp; //RN parameter sds
+  matrix[I,3] std_dev; //individual-level RN deviations
+  cholesky_factor_corr[3] R_chol; //RN parameter correlations
+}
+transformed parameters {
+  matrix[I,3] zp; //individual phenotypic RN parameter values
+  zp =  std_dev * diag_pre_multiply(sd_zp, R_chol);
+}
+model{
+  //separate RN parameters
+  vector[I] zp_mu = col(zp,1); //personality
+  vector[I] zp_beta = col(zp,2); //plasticity
+  vector[I] zp_theta = col(zp,3); //predictability
+  
+  //initialize vectors for response models
+  vector[N] z_mu; //linear predictor of behavior expectation
+  vector[N] z_sigma; //linear predictor of behavior dispersion
+  vector[I] w_eta; //linear predictor of fitness expectation
+
+  //behavioral RN response model
+  z_mu = mu_0z + zp_mu[ind] + (beta_1z + zp_beta[ind]).*x ;
+  z_sigma = exp(theta_0z + zp_theta[ind]) ;
+  z ~ normal(z_mu, z_sigma);
+    
+  //fitness response model
+  w_eta = mu_0 + betas[1]*zp_mu + betas[2]*zp_beta + betas[3]*zp_theta +
+                 betas[4]*(zp_mu .*zp_mu) + betas[5]*(zp_beta .*zp_beta) + 
+                 betas[6]*(zp_theta .*zp_theta) +   
+                 betas[7]*(zp_mu .*zp_beta) + betas[8]*(zp_mu .*zp_theta) + 
+                 betas[9]*(zp_beta .*zp_theta) ;
+  w ~ normal(w_eta, sigma_0);
+
+  //model priors
+  
+  //fixed effects
+  mu_0z ~ normal(0,1);
+  beta_1z ~ normal(0,1);
+  theta_0z ~ normal(0,1);
+  mu_0 ~ normal(0,1);
+  betas ~ normal(0,1); 
+  
+  //random effects
+  sd_zp ~ exponential(1);
+  R_chol ~ lkj_corr_cholesky(2);
+  to_vector(std_dev) ~ std_normal();
+  sigma_0 ~ exponential(1);
+}
+
+generated quantities{
+matrix[3,3] R = R_chol * R_chol'; //RN correlation matrix
+matrix[3,3] S = diag_matrix(sd_zp); //RN correlation matrix
+matrix[3,3] P = S*R*S; //RN covariance
+vector<lower=0>[3] V_P = sd_zp .* sd_zp; //RN variances
+}",
+"mod1.stan")
+
+```
+
+
+## Estimate model
+...
+
+## Hypothesis testing
+...
+
+## Calculating selection differentials
+...
+
+## Plotting results
+...
+
+# Forthcoming tutorials
+
+Further examples will be added in the coming months for simplifying the full model (e.g. only considering selection on personality), estimating non-Gaussian response models and selection gradients, introducing repeated fitness measures, and including structural equation models.
+
+\pagebreak
+
+# References
