@@ -82,19 +82,19 @@ Current approaches to this problem do not provide a generalized solution
 for modelling reaction norm effects with nonlinear structure, such as
 stabilizing, disruptive, balancing, and/or correlational selection,
 which are necessary for testing adaptive theory of individual variation.
-To address this issue, a solution is presented for straightforward and
-unbiased estimation of linear and nonlinear reaction norm effects on
-fitness for Gaussian and non-Gaussian measurements. This solution
-involves specifying BLUPs as both random and fixed effects in a single
-Bayesian multi-response model. By simultaneously accounting for
-uncertainty in reaction norm parameters and their causal effects on
-other measures, the risks accompanying classical approaches to BLUPs can
-be effectively avoided. A novel method for visualizing multivariate
-selection with such models is also proposed. Simulations are used to
-validate that the proposed models provide unbiased estimation across
-realistic parameter values. An extensive Coding tutorial is additionally
-provided to aid researchers in applying this method to their own
-datasets in R.
+To address this issue, I present a novel solution for straightforward
+and unbiased estimation of linear and nonlinear reaction norm effects on
+fitness, applicable to both Gaussian and non-Gaussian measurements. This
+solution involves specifying BLUPs as random effects on behavior and
+fixed effects on fitness within a Bayesian multi-response model. By
+simultaneously accounting for uncertainty in reaction norm parameters
+and their causal effects on other measures, the risks accompanying
+classical approaches to BLUPs can be effectively avoided. I also
+introduce a new method for visualizing the consequences of multivariate
+selection on reaction norms. Simulations are then used to validate that
+the proposed models provide unbiased estimates across realistic
+parameter values, and an extensive coding tutorial is provided to aid
+researchers in applying this method to their own datasets in R.
 \end{abstract}
 
 \keywords{
@@ -150,8 +150,7 @@ RNs has also increased in related fields of inquiry such as personality
 psychology (\protect\hyperlink{ref-Nettle2010}{Nettle and Penke 2010})
 and evolutionary anthropology (\protect\hyperlink{ref-Jaeggi2016}{Jaeggi
 et al. 2016}), suggesting that an integrative framework for studying the
-evolution of RNs will benefit research on biological individuality more
-generally.
+evolution of RNs will benefit research on individuality more generally.
 
 For labile phenotypes such as behavior, hormones, and cognition, the
 magnitude of repeatable between-individual variation in measurements is
@@ -193,40 +192,39 @@ repeatable sources of between-individual variation
 GLMMs are a powerful tool not only for estimating RNs from empirical
 data using random effects, but also for subsequently modeling the fixed
 effects of personality, plasticity, and predictability on fitness and
-other biological outcomes of interest. Nevertheless, although GLMMs are
-quite robust (\protect\hyperlink{ref-Schiel2020}{Schielzeth et al.
-2020}), they can only give as much information about RNs and their
-effects as the model assumptions and empirical data provided to them.
-For labile phenotypes like behavior, this means that the predicted
-random effect values of RN parameters, also known as best linear
-unbiased predictors (BLUPs), are often inferred with non-trivial degrees
-of statistical uncertainty. The use of BLUP point estimates to predict
-outcomes in another response model will, therefore, artificially reduce
-uncertainty in the estimated effects of RNs and increase the risk of
-false positives (see \protect\hyperlink{ref-Hadfield2010}{Hadfield et
-al. 2010} for a detailed treatment). Previous solutions to this problem
-have provided effective antidotes to the anti-conservative inference
-encouraged by ignoring uncertainty in BLUPs
-(\protect\hyperlink{ref-Hous2017}{Houslay and Wilson 2017}). However,
-these solutions also reduce empiricists' capacity to effectively model
-the nonlinear effects of RNs on fitness-relevant outcomes, which is
-necessary for understanding the degree to which natural selection is
-actively maintaining or diminishing individual variation in behavior
-(see \textbf{Figure \ref{fig:fig2}}). The present study therefore
-introduces a new method to facilitate unbiased estimation of nonlinear
-RN effects within a Bayesian GLMM framework. The proposed solution is
-first motivated through a brief discussion of current approaches to the
-misuse of BLUPs and their benefits and limitations. The novel method is
-then formally introduced and demonstrated along with a novel approach to
-modeling the effects of multivariate selection. Code is also provided on
-the accompanying
-\href{https://github.com/Jordan-Scott-Martin/Selection-on-RNs}{Github
-page} for this manuscript showing how to estimate these models with the
-Stan statistical programming language
-(\protect\hyperlink{ref-Stan}{Carpenter et al. 2017}) in R
-(\protect\hyperlink{ref-Rbase}{R Core Team 2020}), which will aid
-researchers in investigating nonlinear RN effects with their own
-datasets.
+other biological outcomes of interest. Nevertheless, although GLMMs
+provide a quite robust modeling framework
+(\protect\hyperlink{ref-Schiel2020}{Schielzeth et al. 2020}), they can
+only give as much information about RNs and their effects as the model
+assumptions and empirical data provided to them. For labile phenotypes
+like behavior, this means that the predicted random effect values of RN
+parameters, also known as best linear unbiased predictors (BLUPs), are
+often inferred with non-trivial degrees of statistical uncertainty. The
+use of BLUP point estimates to predict outcomes in another response
+model will, therefore, artificially reduce uncertainty in the estimated
+effects of RNs and increase the risk of false positives (see
+\protect\hyperlink{ref-Hadfield2010}{Hadfield et al. 2010} for a
+detailed treatment). Previous solutions to this problem have provided
+effective antidotes to the anti-conservative inference encouraged by
+ignoring uncertainty in BLUPs (\protect\hyperlink{ref-Hous2017}{Houslay
+and Wilson 2017}). However, these solutions also reduce empiricists'
+capacity to effectively model the nonlinear effects of RNs on
+fitness-relevant outcomes, which is necessary for understanding the
+degree to which natural selection is actively maintaining or diminishing
+individual variation in behavior. The present study therefore introduces
+a new method to facilitate unbiased estimation of nonlinear RN effects
+within a Bayesian GLMM framework. The proposed solution is first
+motivated through a brief discussion of current approaches to the misuse
+of BLUPs and their benefits and limitations. I then formally introduce
+the proposed method along with a novel approach to visualizing the
+effects of multivariate selection on reaction norms. I also provide R
+code (\protect\hyperlink{ref-Rbase}{R Core Team 2020}) and tutorials on
+the accompanying Github repository for this manuscript
+\href{https://github.com/Jordan-Scott-Martin/Selection-on-RNs}{(https://github.com/Jordan-Scott-Martin/Selection-on-RNs)},
+demonstrating how to estimate these models with the Stan statistical
+programming language (\protect\hyperlink{ref-Stan}{Carpenter et al.
+2017}). These tutorials will aid researchers in investigating nonlinear
+RN effects with their own datasets.
 
 \begin{figure}
 \hspace*{-1cm}
@@ -343,21 +341,22 @@ al. 2019}; \protect\hyperlink{ref-Hadfield2017}{Hadfield and Thomson
 
 A particular concern is that testing adaptive theory of individual
 variation often requires evaluating nonlinear selection on behavioral
-RNs (\textbf{Figure \ref{fig:fig2}}). These nonlinear effects simply
-cannot be estimated by random effect covariances, as covariance is by
-definition a measure of linear dependency and thus does not capture
-nonlinear dependencies among measures. However, it is straightforward to
-capture these patterns using fixed quadratic and interaction effects in
-a parametric fitness model (\protect\hyperlink{ref-Lande1983}{Lande and
-Arnold 1983}). For example, if the population RN is at an evolutionary
-equilibrium, so that RN variation is non-adaptive within the population
-and results from processes such as mutation-selection balance or
-developmental noise (e.g. \protect\hyperlink{ref-Bierbach2017}{Bierbach,
-Laskowski, and Wolf 2017}; \protect\hyperlink{ref-Tooby1990}{Tooby and
-Cosmides 1990}), then we should expect to find evidence of stabilizing
-selection around the population average RN parameters. This would be
-observed in a Lande-Arnold selection analysis as null or weak linear
-effects and negative quadratic effects
+RNs (\textbf{Figure \ref{fig:fig2}}). In general, these nonlinear
+effects cannot be accurately estimated by random effect covariances, as
+covariance is by definition a measure of linear dependency and thus does
+not capture nonlinear dependencies among measures. However, it is
+straightforward to capture these patterns using fixed quadratic and
+interaction effects in a parametric fitness model
+(\protect\hyperlink{ref-Lande1983}{Lande and Arnold 1983}). For example,
+if the population RN is at an evolutionary equilibrium, so that RN
+variation is non-adaptive within the population and results from
+processes such as mutation-selection balance or developmental noise
+(e.g. \protect\hyperlink{ref-Bierbach2017}{Bierbach, Laskowski, and Wolf
+2017}; \protect\hyperlink{ref-Tooby1990}{Tooby and Cosmides 1990}), then
+we should expect to find evidence of stabilizing selection around the
+population average RN parameters. In the absence of correlational
+selection, this would be observed in a Lande-Arnold selection analysis
+as null or weak linear effects and negative quadratic effects
 (\protect\hyperlink{ref-Stinch2008}{Stinchcombe et al. 2008}), assuming
 the population had not been recently displaced from a fitness peak by
 non-adaptive processes. Alternatively, strong disruptive selection,
@@ -394,21 +393,20 @@ example, select for males with high levels of both personality and
 predictability in aggressiveness
 (\protect\hyperlink{ref-Scherer2018}{Scherer, Kuhnhardt, and Schuett
 2018}). When RNs are under such correlational selection, interaction
-effects are expected between RN parameters on fitness, irrespective of
-the linear main effects of each trait
+effects are expected between RN parameters on fitness
 (\protect\hyperlink{ref-Blows2003}{Blows 2003}). Of course, these
-considerations also apply to a host of other RN effects on outcomes
-other than fitness, such as the exponential effects of personality in
-activity level and anxiety on seed removal and dispersal among small
-mammals (\protect\hyperlink{ref-Brehm2019}{Brehm et al. 2019}). In all
-such cases, one would not detect these theoretically pertinent
-relationships using linear covariances among random effects, but must
-instead directly specify fixed quadratic and interactive effects caused
-by behavioral RNs. A variety of more complex fitness surfaces can also
-be captured through the combination of these quadratic and interaction
-effects (\protect\hyperlink{ref-Phillips1989}{Phillips and Arnold
-1989}), or higher term polynomials, as shown in \textbf{Figure
-\ref{fig:fig2}} for a bivariate analysis.
+considerations also apply to a host of RN effects on outcomes other than
+fitness, such as the exponential effects of personality in activity
+level and anxiety on seed removal and dispersal among small mammals
+(\protect\hyperlink{ref-Brehm2019}{Brehm et al. 2019}). In all such
+cases, one would not detect these theoretically pertinent relationships
+using linear covariances among random effects, but must instead directly
+specify fixed quadratic and interactive effects caused by behavioral
+RNs. A variety of more complex fitness surfaces can also be captured
+through the combination of these quadratic and interaction effects
+(\protect\hyperlink{ref-Phillips1989}{Phillips and Arnold 1989}), or
+higher term polynomials, as shown in \textbf{Figure \ref{fig:fig2}} for
+a bivariate analysis.
 
 A potential solution to this challenge is to model the squared and
 product values of raw measurements as additional responses with
@@ -435,8 +433,8 @@ model, and then (ii) estimate a separate model with fixed RN effects,
 running the analysis repeatedly over the posterior distribution of BLUPs
 estimated in the first model. While this approach technically carries
 the uncertainty in RNs forward, thus avoiding the undesirable
-consequences of point estimates, it nevertheless results in downwardly
-biased estimates of the RN fixed effects, as
+consequences of point estimates, it can nevertheless result in
+downwardly biased estimates of the RN fixed effects, as
 \protect\hyperlink{ref-Ding2020b}{Dingemanse et al.}
 (\protect\hyperlink{ref-Ding2020b}{2020}) observed in supplementary
 simulations. Although these authors did not provide an explanation for
@@ -450,7 +448,7 @@ independently of the RN effects on the outcome of interest, so that the
 estimated uncertainty in BLUPs is by design statistically independent of
 uncertainty in the RN effects estimated in the second stage of the
 analysis. This does not, however, make the use of BLUP point estimates
-any less dangerous or more desirable, but is simply an artifact of not
+any less risky or more desirable, but is simply an artifact of not
 simultaneously accounting for both sources of uncertainty in the same
 model. It is important to remember that BLUPs and RNs are latent,
 statistical inferences, not directly measured trait values or mere
@@ -472,8 +470,8 @@ to non-linear mean and variance effects on the original scale.
 \hspace*{-1.75cm}
 \includegraphics[scale=0.7]{fig2.pdf}
 \caption{Nonlinear selection surfaces for behavioral RNs. Adaptiveness is indicated by the color of the line or surface, with red indicating lower relative fitness ($w$) and gold indicating higher relative fitness. \\ \\
-$\boldsymbol{Top \ row}$. Patterns of nonlinear selection on a single behavioral RN parameter ${z_{\mathrm{p}m}}$, which also apply to selection on multiple traits in the absence of correlational selection between traits. Dashed lines intercept the expected population-level trait value and relative fitness at (${z_{\mathrm{p}m}}=0, {w}=1$). $Left \ panel$: stabilizing selection on trait values, which maintains the population average trait value at an evolutionary equilibrium and reduces individual variation. $Middle \ panel$: disruptive selection, which increases the frequency of extreme trait values and increases individual variation as a consequence. $Right \ panel$: balancing selection, in which the fitness consequences of a trait value vary across different states, causing the maintenance of individual variation across multiple selection events. States refer to any factors that modulate the fitness consequences of a behavior, such as differing spatial and/or temporal contexts, population densities, or frequencies of social partner strategies. States may also be endogenous factors that determine whether it is adaptive to express a particular RN trait value, such as the effects of body size and condition on the consequences of boldness and aggression.  \\ \\
-$\boldsymbol{Bottom \ row}$. Patterns of nonlinear selection on two behavioral RN parameters ${z_{\mathrm{p}m}}$ and ${z_{\mathrm{p}n}}$. Due to the presence of correlational selection, the adaptiveness of any trait value for parameter $m$ is contingent on the trait value for parameter $n$ (and vice versa). $Left \ panel$: a dome-shaped selection surface, where a combination of slightly negative parameters has the highest fitness. $Middle \ panel$: a bowl- or hammock-shaped selection surface, with the most adaptive phenotypes combining extremely high or low trait values in both parameters. $Right \ panel$: a saddle-shaped selection surface, where phenotypes combining moderate trait values for $m$ and extremely low trait values for $n$ achieve the highest relative fitness.
+$\boldsymbol{Top \ row}$. Patterns of nonlinear selection on a single behavioral RN parameter ${z_{\mathrm{p}m}}$, which also apply to selection on multiple traits in the absence of correlational selection between traits. Dashed lines intercept the expected population-level trait value and relative fitness at (${z_{\mathrm{p}m}}=0, {w}=1$). $Left \ panel$: stabilizing selection on trait values, which maintains the population average trait value at an evolutionary equilibrium and reduces individual variation. $Middle \ panel$: disruptive selection, which increases the frequency of extreme trait values and increases individual variation as a consequence. $Right \ panel$: balancing selection, in which the fitness consequences of a trait value vary across different states, causing the maintenance of individual variation across multiple selection events. States refer to any factors that modulate the fitness consequences of a behavior, such as differing spatial and/or temporal contexts, population densities, or frequencies of social partner strategies. States may also be endogenous factors that determine whether it is adaptive to express a particular RN trait value, such as the effects of body size and condition on the fitness consequences of boldness and aggression.  \\ \\
+$\boldsymbol{Bottom \ row}$. Patterns of nonlinear selection on two behavioral RN parameters ${z_{\mathrm{p}m}}$ and ${z_{\mathrm{p}n}}$. Due to the presence of correlational selection, the adaptiveness of any trait value for parameter $m$ is contingent on the trait value for parameter $n$ (and vice versa). $Left \ panel$: a dome-shaped selection surface, where a combination of slightly negative parameters has the highest fitness. $Middle \ panel$: a bowl-shaped selection surface, with the most adaptive phenotypes combining extremely high or low trait values in both parameters. $Right \ panel$: a saddle-shaped selection surface, where phenotypes combining moderate trait values for $m$ and extremely low trait values for $n$ achieve the highest relative fitness.
 }
 \label{fig:fig2}
 \end{figure}
@@ -493,14 +491,10 @@ treated as random effects on their observed behaviors as well as fixed
 effects on outcome measures of interest (e.g.~survival and reproduction,
 habitat choice, performance in an experimental task, etc.). In this
 section, this basic modelling approach is formally introduced, along
-with various extensions of interest for specific empirical scenarios. A
-novel and straightforward method for visualizing the within-generation
-effects of multivariate selection is also proposed, which will
-compliment models considering selection on multiple RN parameters. To
-aid researchers in applying these models to their own datasets, I've
-provided detailed R coding tutorials on the accompanying
-\href{https://github.com/Jordan-Scott-Martin/Selection-on-RNs}{Github
-page} for this manuscript.
+with various extensions of interest for specific empirical scenarios. I
+also end by proposing a novel and straightforward method for visualizing
+the within-generation effects of multivariate selection on reaction
+norms.
 
 \hypertarget{multivariate-glmms-for-nonlinear-selection-on-rns}{%
 \subsection{Multivariate GLMMs for nonlinear selection on
@@ -597,16 +591,17 @@ often lack repeated measures of fitness or fitness-proxies (e.g.~bodily
 condition, clutch size, mate choice), the presented models assume that a
 single fitness measure is available per individual, although this
 assumption can be relaxed by including additional random effects to
-account for unobserved heterogeneity in repeated measures. For
+account for unobserved heterogeneity in repeated fitness measures. For
 simplicity, we also begin by assuming that the fitness measure can be
 effectively described by a Gaussian distribution, which simplifies the
 estimation of selection gradients and differentials below. As is
 appropriate for modelling relative fitness
 (\protect\hyperlink{ref-Lande1983}{Lande and Arnold 1983}), \(w\) is
-mean-scaled so that \(w_j = W_j/\bar{W}\). For notational clarity, we
-now introduce superscripts \((z)\) to distinguish parameters that are
-specific to the \(z\) response model from those in the \(w\) response
-model.
+mean-scaled so that \(w_j = W_j/\bar{W}\) where \(\bar{W}\) is the mean
+absolute fitness across individuals. For notational clarity, we now
+introduce superscripts \((z)\) to distinguish parameters that are
+specific to the \(z\) behavioral response model from those in the \(w\)
+fitness response model.
 
 \begin{equation} \tag{1.2}\label{eq:1.2}
 \begin{gathered}[t]
@@ -651,6 +646,11 @@ repeatable variation in raw measurements due to personality, plasticity,
 and predictability. This multi-response GLMM thus provides a flexible
 and intuitive means of integrating the benefits as well as overcoming
 the limitations of multiple previously suggested statistical approaches.
+It is also important to note that the proposed model can always be
+simplified to facilitate studies of selection on individual RN
+parameters, should researchers lack sufficient repeated samples or
+environmental data to simultaneously address personality, plasticity,
+and predictability.
 
 When this quadratic regression model effectively approximates the
 individual selection surface (\protect\hyperlink{ref-Lande1983}{Lande
@@ -693,14 +693,14 @@ can instead be specified in the fitness response model, where the
 Hadamard division \(\oslash\) indicates element-wise division of each
 parameter by its standard deviation, which are contained on the diagonal
 of the \(\boldsymbol{\mathrm{S}}\) matrix. The selection model can also
-be extended to account for various kinds of balancing selection on
-directional selection gradients (see \textbf{Figure \ref{fig:fig2}}) by
-including additional interaction effects for the relevant state
-variables. For example, \(\beta_{I} ( \mu^{(z)}_{j} * \mathrm{N} )\)
-could be estimated to assess the presence of density-dependent selection
-on personality across differing population sizes \(\mathrm{N}\).
+be extended to account for various kinds of balancing selection (see
+\textbf{Figure \ref{fig:fig2}}) by including additional interaction
+effects for the relevant state variables. For example,
+\(\beta_{I} ( \mu^{(z)}_{j} * \mathrm{N} )\) could be estimated to
+assess the presence of density-dependent selection on personality across
+differing population sizes \(\mathrm{N}\).
 
-It is common in selection analyses to estimate such linear and nonlinear
+It is common in selection analyses to estimate linear and nonlinear
 gradients on observed trait values \(\boldsymbol{z}\), rather than
 directly on RN parameters \(\boldsymbol{z}_{\boldsymbol{\mathrm{p}}}\)
 as proposed here. However, it is ultimately the repeatable individual
@@ -717,8 +717,8 @@ Moreover, when RN parameters are not completely integrated, so that
 act on independent variation in each element of
 \(\boldsymbol{z}_{\boldsymbol{\mathrm{p}}}\), leading to distinct
 changes in the population RN intercept, slope, and dispersion within and
-across generations. These adaptive processes will always be confounded
-when solely considering selection on observed trait values
+across generations. These adaptive processes will be confounded when
+solely considering selection on observed trait values
 \(\boldsymbol{z}\). The global effects of RN parameter selection on the
 shape of the population RN function can also be straightforwardly
 estimated and visualized using methods developed further below.
@@ -764,8 +764,8 @@ papers to use and/or recommend using highly diffuse or flat priors (e.g.
 \protect\hyperlink{ref-Hous2017}{Houslay and Wilson 2017};
 \protect\hyperlink{ref-Vill2016}{Villemereuil et al. 2016}), it is also
 well established within the statistics literature that weakly
-informative, regularizing priors--which pool hypotheses toward null
-values and provide low prior probability to extreme effect
+informative, regularizing priors--which slightly pull parameters toward
+null values and provide low prior probability to extreme effect
 sizes--facilitate more robust inferences and should generally be
 preferred over flat priors whenever possible
 (\protect\hyperlink{ref-Gelman2000}{Gelman and Tuerlinckx 2000};
@@ -778,7 +778,7 @@ simply use general-purpose, conservative priors as a means of increasing
 the generalizability and robustness of their findings, even in a state
 of relative ignorance about the true effect size. For most GLMMs, priors
 such as \(\mu,\beta \sim \mathrm{Normal}(0,1)\),
-\(\mathrm{diag}(\boldsymbol{\mathrm{S}}),\sigma \sim \mathrm{Half-Cauchy}(0,1)\),
+\(\mathrm{diag}(\boldsymbol{\mathrm{S}}),\sigma \sim \mathrm{Exponential}(1)\),
 and \(\boldsymbol{\mathrm{R}} \sim \mathrm{LKJ}(2)\) provide effective
 weakly regularizing priors. See
 \protect\hyperlink{ref-Lemoine2019}{Lemoine}
@@ -833,14 +833,14 @@ tests of biologically substantive hypotheses given the observed data,
 the evaluation of which is generally the primary goal of scientific
 research. As such, intuitive interpretation can be made of the posterior
 probabilities, so that values closer to 1 indicate greater support for
-the tested directional hypotheses and values closer to 0 indicate
-stronger support for the opposite directional hypotheses. These Bayesian
-hypothesis tests help to avoid many common misinterpretations of
-classical tests, such as interpreting confidence intervals as reflecting
-the probable range of the true effect, interpreting \emph{P}-values as
-providing the probability of the null hypothesis being true, or
-interpreting the rejection of a null hypothesis test as being indicative
-of the substantive (``alternative'') hypothesis being correct
+the tested hypotheses and values closer to 0 indicate stronger support
+for the opposite hypotheses. These Bayesian hypothesis tests help to
+avoid many common misinterpretations of classical tests, such as
+interpreting confidence intervals as reflecting the probable range of
+the true effect, interpreting \emph{P}-values as providing the
+probability of the null hypothesis being true, or interpreting the
+rejection of a null hypothesis test as being indicative of the
+substantive (``alternative'') hypothesis being correct
 (\protect\hyperlink{ref-Green2016}{Greenland et al. 2016};
 \protect\hyperlink{ref-Rethinking}{McElreath 2020};
 \protect\hyperlink{ref-McShane2019}{McShane et al. 2019}). Furthermore,
@@ -855,7 +855,7 @@ repeatabilities.
 \subsubsection{Non-Gaussian fitness
 measures}\label{non-gaussian-fitness-measures}}
 
-Despite the expected robustness of GLMMs to violations of distributional
+Despite the expected robustness of LMMs to violations of distributional
 assumptions, any particular study will be at a non-trivial risk of
 inferential bias when applying a linear fitness model to outcomes that
 are clearly better described by a non-Gaussian distribution
@@ -872,7 +872,7 @@ time spent in an activity, and so on. In all such cases, researchers
 will benefit from more reliable inferences and model predictions if they
 try to accurately describe the data generating process with an
 appropriate non-Gaussian distribution, rather than attempting to
-pidgeonhole their analysis into a linear model. Fortunately, the Stan
+pigeonhole their analysis into a linear model. Fortunately, the Stan
 statistical programming language provides a plethora of possible
 distributions for GLMM likelihood functions, as well as the capacity to
 specify any custom likelihood functions of interest. To account for
@@ -914,7 +914,7 @@ effects, there is no need to introduce a linear predictor and
 corresponding link function. While it was straightforward to translate
 regression coefficients to selection gradients in the Gaussian fitness
 model, the link function introduced in the non-Gaussian model
-complicates matters. However, as demonstrated by
+complicates matters. However, as discussed by
 \protect\hyperlink{ref-Morrissey2013}{Morrissey and Sakrejda}
 (\protect\hyperlink{ref-Morrissey2013}{2013}), appropriate gradients can
 nonetheless be estimated manually using partial derivative functions
@@ -946,8 +946,8 @@ due to \(\boldsymbol{ \upbeta}\) and \(\boldsymbol{ \upgamma }\) with
 indirect effects caused by trait integration due to
 \(\boldsymbol{\mathrm{P}}=\boldsymbol{\mathrm{S}}\boldsymbol{\mathrm{R}}\boldsymbol{\mathrm{S}}\).
 Following \protect\hyperlink{ref-Lande1983}{Lande and Arnold}
-(\protect\hyperlink{ref-Lande1983}{1983}), we define linear and
-quadratic differentials such that
+(\protect\hyperlink{ref-Lande1983}{1983}), linear and quadratic
+differentials are defined such that
 \begin{equation} \tag{4.1}\label{eq:4.1}
 \begin{gathered}[t]
 \Delta_{\mathrm{T}} \bar{\boldsymbol{z}}_{\boldsymbol{\mathrm{p}}} =
@@ -956,14 +956,14 @@ quadratic differentials such that
 \end{gathered}
 \end{equation}
 
-where \(\Delta_{\mathrm{T}}\) indicates the total (i.e.~direct +
+where \(\Delta_{\mathrm{T}}\) indicates the total (i.e.~direct and
 indirect) within-generation effect of selection. We can also consider
 the effects of selection in the hypothetical case of complete
 independence between RN parameters by instead using a diagonal matrix
 \(\boldsymbol{\mathrm{V}}=\boldsymbol{\mathrm{S}}^2\) of trait
 variances. \begin{equation} \tag{4.2}\label{eq:4.2}
 \begin{gathered}[t]
-\Delta_{\mathrm{D}} \boldsymbol{z}_{\boldsymbol{\mathrm{p}}} =
+\Delta_{\mathrm{D}}\bar{\boldsymbol{z}}_{\boldsymbol{\mathrm{p}}} =
 \boldsymbol{\mathrm{V}} \boldsymbol{\upbeta}, \\ 
 \Delta_{\mathrm{D}} \boldsymbol{\mathrm{V}} = \boldsymbol{\mathrm{V}} \left( \boldsymbol{\upgamma} - \boldsymbol{ \upbeta \upbeta }^{'} \right) \boldsymbol{\mathrm{V}} \nonumber
 \end{gathered}
@@ -981,8 +981,8 @@ through indirect effects (\protect\hyperlink{ref-Conner2012}{Conner
 straightforward testing of adaptive hypotheses on specific behavioral
 parameters, even in the presence of high-dimensional data, strong
 phenotypic constraints, and highly nonlinear selection surfaces. If
-\(\Delta_{\mathrm{D}} \boldsymbol{z}_{\boldsymbol{\mathrm{p}}m} > 0\)
-for RN parameter \(m\), then selecting is acting to increase the mean
+\(\Delta_{\mathrm{D}} \bar{\boldsymbol{z}}_{\boldsymbol{\mathrm{p}}m} > 0\)
+for RN parameter \(m\), then selection is acting to increase the mean
 trait value in the population (and vice versa for negative change).
 Similarly, \(\Delta_{\mathrm{D}} \boldsymbol{\mathrm{V}}_{m,m} > 0\)
 indicates that selection is acting to increase individual variation in
@@ -993,13 +993,12 @@ individuality is being selected against. For the off-diagonal elements,
 that selection is actively promoting positive or negative trait
 integration between RN parameters \(m\) and \(n\), suggesting that
 behavioral syndromes are also adaptive. As shown in \textbf{Figure
-\ref{fig:fig3}}, it will often be helpful to express these variances and
-covariances in terms of standard deviations and correlations for ease of
-comparison and visualization.
+\ref{fig:fig3}}, it will often be helpful to express these covariances
+as correlations for ease of comparison and visualization.
 
-\hypertarget{visualizing-multivariate-selection}{%
-\subsubsection{Visualizing multivariate
-selection}\label{visualizing-multivariate-selection}}
+\hypertarget{visualizing-the-effects-of-multivariate-selection}{%
+\subsubsection{Visualizing the effects of multivariate
+selection}\label{visualizing-the-effects-of-multivariate-selection}}
 
 When modelling selection on a single RN parameter, it is straightforward
 to relate concave or convex quadratic gradients in Eq \ref{eq:1.2} or Eq
@@ -1086,9 +1085,9 @@ in Eq \ref{eq:4.1} and Eq \ref{eq:4.2}. Firstly,
 \(\Delta \bar{\boldsymbol{z}}_{\boldsymbol{\mathrm{p}}}\) inform the
 expected change in the mean of each RN parameter, while the diagonal
 elements of \(\Delta \boldsymbol{\mathrm{P}}\) informs the change in the
-variance (or standard deviation) of each RN parameter. The off-diagonal
-elements of \(\Delta \boldsymbol{\mathrm{P}}\) instead capture changes
-in the integration among RN parameters, which can be standardized to
+variance of each RN parameter. The off-diagonal elements of
+\(\Delta \boldsymbol{\mathrm{P}}\) instead capture changes in the
+integration among RN parameters, which can be standardized to
 correlations for ease of interpretation. The effect of direct versus
 indirect selection effects caused by RN parameter integration can be
 further informed by the difference between \(\Delta_{\mathrm{D}}\) and
@@ -1103,23 +1102,22 @@ the overall shape of the population behavioral strategy. Each of these
 pieces of information is to some degree unique and informative for our
 theoretical understanding of adaptive individual variation. Therefore,
 the proposed method is simply to plot all of this information together
-in a single figure of multivariate selection on the behavioral RN, along
-with the posterior uncertainty in the expected effects of selection.
-This visualization method is demonstrated in \textbf{Figure
+in a single figure of multivariate selection effects on the behavioral
+RN, along with the posterior uncertainty in the expected effects of
+selection. This visualization method is demonstrated in \textbf{Figure
 \ref{fig:fig3}} for a hypothetical empirical scenario characterized by
 directional, quadratic, and correlational selection on personality,
 plasticity, and predictability. Note that all of these estimates are
 taken on the latent linear scale defined in the model, but they can
 always be predicted on the original data scale by applying the
-appropriate inverse link function on the link-scale absolute values
-(i.e.~original population RN value + expected population RN change on
-the latent scale).
+appropriate inverse link function on the transformed absolute values
+(i.e.~link-scale population RN value + expected population RN change).
 
 \begin{figure}
 \hspace*{-1.6cm}
 \includegraphics[scale=0.73]{fig3_2.pdf}
 \caption{Proposed representation of multivariate selection on a behavioral RN. Plots are shown for the within-generation effects of a hypothetical selection event, where selection was characterized by a combination of directional, quadratic, and correlational fitness effects across RN parameters. Distinct outcomes are shown for the direct effects of selection ($\Delta_{\mathrm{D}}$) causing adaptation independent of trait covariation, as well as the total effects of selection ($\Delta_{\mathrm{T}}$) accounting for indirect effects due to phenotypic integration among RN parameters.  \\ \\ 
-$\boldsymbol{Left \ panel}$: Three rows are shown for the distinct effects of multivariate selection on the average population RN parameter values ($\Delta \boldsymbol{\bar{z}}_\mathrm{p}$), individual variation in population RN values (represented by the population standard deviations, $\Delta \boldsymbol{\mathrm{S}}_\mathrm{z_p}$), and the integration among RN parameters (represented by the population correlations, $\Delta \boldsymbol{\mathrm{R}}_\mathrm{z_p}$). Uncertainty around these predicted changes is captured by posterior distributions of each selection differential, with the posterior probability $\Pr(\Delta)$ supporting the expected direction of change for total and direct effects indicated in the top corner of each plot. If individual differences are adaptive, it is expected that selection will act to directly increase or maintain the population SD of RN parameters ($\Delta_{\mathrm{D}} \boldsymbol{\mathrm{S}}_\mathrm{z_p} \geq 0$); similarly, if trait integration is adaptive, selection will directly increase or maintain trait correlations (i.e. $\Delta_{\mathrm{D}} \boldsymbol{\mathrm{R}}_\mathrm{z_p} \geq 0$). Adaptation may nevertheless be constrained or accelerated by indirect effects due to phenotypic integration. In this hypothetical scenario, it can be seen that although selection is acting to decrease individual variation in predictability, $\mathrm{Pr}(\Delta_{\mathrm{D}}=0.98 )$, indirect effects lead to no clear expected change in the population standard deviation, $\mathrm{Pr}(\Delta_{\mathrm{T}}=0.69 )$. Similarly, while there is only weak evidence of direct selection to decrease the mean plasticity in the population, $\mathrm{Pr}(\Delta_{\mathrm{D}}=0.75 )$, indirect effects are expected to cause a more pronounced change, $\mathrm{Pr}(\Delta_{\mathrm{D}}=0.92 )$.    \\ \\
+$\boldsymbol{Left \ panel}$: Three rows are shown for the distinct effects of multivariate selection on the average population RN parameter values ($\Delta \boldsymbol{\bar{z}}_\mathrm{p}$), individual variation in population RN values (represented by the population variance, $\Delta \boldsymbol{\mathrm{V}}_\mathrm{z_p}$), and the integration among RN parameters (represented by the population correlations, $\Delta \boldsymbol{\mathrm{R}}_\mathrm{z_p}$). Uncertainty around these predicted changes is captured by posterior distributions of each selection differential, with the posterior probability $\Pr(\Delta)$ supporting the expected direction of change for total and direct effects indicated in the top corner of each plot. If individual differences are adaptive, it is expected that selection will act to directly increase or maintain the population variance of RN parameters ($\Delta_{\mathrm{D}} \boldsymbol{\mathrm{V}}_\mathrm{z_p} \geq 0$); similarly, if trait integration is adaptive, selection will directly increase or maintain trait correlations (i.e. $\Delta_{\mathrm{D}} \boldsymbol{\mathrm{R}}_\mathrm{z_p} \geq 0$). Adaptation may nevertheless be constrained or accelerated by indirect effects due to phenotypic integration. In this hypothetical scenario, it can be seen that although selection is acting to decrease individual variation in predictability, $\mathrm{Pr}(\Delta_{\mathrm{D}}=0.98 )$, indirect effects lead to no clear expected change in the population variance, $\mathrm{Pr}(\Delta_{\mathrm{T}}=0.69 )$. Similarly, while there is only weak evidence of direct selection to decrease the mean plasticity in the population, $\mathrm{Pr}(\Delta_{\mathrm{D}}=0.75 )$, indirect effects are expected to cause a more pronounced change, $\mathrm{Pr}(\Delta_{\mathrm{D}}=0.92 )$.    \\ \\
 $\boldsymbol{Right \ panel}$: The expected change in the shape of the population behavioral RN following selection. The population RN prior to selection is indicated by the grey line and band. Point estimates from the posterior distributions of $\Delta \boldsymbol{\bar{z}}_\mathrm{p}$ are used to visualize how direct and total selection effects shift the mean population RN across the relevant environmental gradient. The dashed, shaded bands indicate the $95\%$ credible intervals (i.e. $1.96*\uptheta$) capturing the expected levels of behavioral predictability in the population.
 }
 \label{fig:fig3}
@@ -1136,7 +1134,7 @@ procedure for validating the performance of any Bayesian algorithm
 across a broad range of possible parameter values, as defined by the
 prior distributions of a generative model. This approach removes the
 arbitrariness of setting a limited range of fixed parameter values for
-assessing inferential bias, which can lead to unexpected sources of bias
+assessing performance, which can lead to unexpected sources of bias
 being overlooked in uninvestigated regions of parameter space (e.g.~rare
 but possible combinations of RN correlations, standard deviations, and
 selection coefficients). Instead, random parameter values are repeatedly
@@ -1577,7 +1575,7 @@ to Choose Weakly Informative Priors in Bayesian Analyses.''}
 \leavevmode\hypertarget{ref-Martin2021}{}%
 Martin, J. S., and A. V. Jaeggi. 2021. {``Social Animal Models for
 Quantifying Plasticity, Assortment, and Selection on Interacting
-Phenotypes.''} \emph{Journal of Evolutionary Biology} XX: XX--.
+Phenotypes.''} \emph{In Review}.
 
 \leavevmode\hypertarget{ref-Martin2019}{}%
 Martin, J. S., J. J. Massen, V. Šlipogor, T. Bugnyar, A. V. Jaeggi, and

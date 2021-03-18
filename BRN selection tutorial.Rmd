@@ -23,13 +23,15 @@ header-includes:
     citecolor=black,
     filecolor=black,
     urlcolor=black}
+    
+urlcolor: blue
 
 ---
 
 # Introduction
 
 This series of tutorials demonstrates how to effectively code and interpret models of nonlinear selection on behavioral reaction norms (RNs), using the Stan statistical programming language [@Stan] in R [@Rbase]. Stan is an open-source programming language for estimating probabilistic models of arbitrary complexity using fully Bayesian inference with state-of-the-art Markov Chain Monte Carlo (MCMC) sampling techniques [@Hoffman2014]. Stan interfaces with R through the RStan package [@Stan], but you will first need to install Stan on your computer and ensure that it is appropriately configured with your C++ toolchain. This can be accomplished by following the instructions for your operating system on the [RStan Getting Started](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started) page. Once you are able to effectively use RStan, you can begin creating the `.stan` files necessary for estimating models. These files can be composed using RStudio or any text editor. A file can be also be composed directly in R
-\linebreak
+\pagebreak
 ```{r}
 write("// for Stan comments
     functions{...} // Stan models are composed of
@@ -40,7 +42,6 @@ write("// for Stan comments
     model {...}
     generated quantities {...} ",
   "mod1.stan")
-
 ```
 
 Once an appropriate `.stan` file is prepared, it can be compiled with R for the C++ toolchain using the `stan_model()` function and subsequently estimated with an appropriate list of empirical data using the `sampling()` function. The resulting posteriors of a model can then be accessed with the `extract()` function and manipulated for any further quantities or analyses of interest.
@@ -102,12 +103,12 @@ w_{j} \sim \mathrm{Normal} \left( \mu_{j}, \sigma _{j} \right) \nonumber \\
 Notation follows @Martin2021a, where this model is explained and justified in greater detail. The individual-specific RN parameter values of behavior $\boldsymbol{z}$ for all individuals are contained in the BLUP vector $\boldsymbol{z_{\mathrm{p}}}$ and the selection effects are described by the regression coefficients $\beta_1,...,\beta_9$ on fitness measure $\boldsymbol{w}$. For this tutorial, we use general-purpose, weakly regularizing priors on model parameters to promote more robust inference and enhance model identification [@Lemoine2019].
 
 ## Simulate dataset
-With the formal model in place, we can now simulate appropriate data to use for its estimation. For computational efficiency, we assume a sample of 100 individuals with 5 repeated behavioral measures and a single fitness measure. Parameter values are arbitrarily fixed so that the population-level intercepts and slopes are 0, with 0.3 for  all regression coefficients in the fitness model and correlations among random effects, as well as residual variances of 0.5 for the behavior and fitness response models.
+With the formal model in place, we can now simulate appropriate data to use for its estimation. We assume a sample of 500 individuals with 6 repeated behavioral measures across the lifespan and a single fitness measure. Parameter values are arbitrarily fixed so that the population-level intercepts and slopes are 0, with 0.3 for all regression coefficients in the fitness model and correlations among random effects, as well as residual variances of 0.5 for the behavior and fitness response models.
 \linebreak
 ```{r}
 #simulation parameters
-I = 100 #number of individuals
-repm = 5 #repeated behavioral measures
+I = 500 #number of individuals
+repm = 6 #repeated behavioral measures
 
 #fixed effects
 beta = 0.3 #regression coefficients
@@ -251,7 +252,7 @@ With these basic parameters in place, we can also further specify parameters in 
 ```{stan, output.var = 'foo', eval=FALSE}
 transformed parameters {
   matrix[I,3] zp; //individual phenotypic RN parameter values
-  zp =  std_dev * diag_pre_multiply(sd_zp, R_chol);
+  zp =  std_dev * diag_pre_multiply(sd_zp, R_chol)' ;
 }
 ```
 
@@ -270,11 +271,11 @@ $$\boldsymbol{z_{\mathrm{std}}} \sim \mathrm{Normal}(0,1)$$
 Similarly for an *I* x *p* matrix $\boldsymbol{Z}$ of *p* phenotypes where
 $$\boldsymbol{Z} \sim \mathrm{MVNormal}(\boldsymbol{0},\boldsymbol{\mathrm{P}}) $$
 we can derive the appropriately scaled values with a matrix of standard normals $\boldsymbol{Z_{\mathrm{std}}}$ and a Cholesky decomposition of $\boldsymbol{\mathrm{P}}$, so that
-$$\boldsymbol{Z} \equiv   \boldsymbol{Z_{\mathrm{std}}} \boldsymbol{\mathrm{P}}_{\mathrm{L}}$$
-$$\boldsymbol{\mathrm{P}}_{\mathrm{L}} = \mathrm{Chol}(\boldsymbol{\mathrm{P}})=
-\mathrm{Chol}(\boldsymbol{\mathrm{S}}\boldsymbol{\mathrm{R}}\boldsymbol{\mathrm{S}})=\boldsymbol{\mathrm{S}}\boldsymbol{\mathrm{R}}_{\mathrm{L}}$$
+$$\boldsymbol{Z} \equiv   \boldsymbol{Z_{\mathrm{std}}} \boldsymbol{\mathrm{P}}_{\mathrm{L}}^{\mathrm{T}}$$
+$$\boldsymbol{\mathrm{P}}_{\mathrm{L}}^{\mathrm{T}} = \mathrm{Chol}(\boldsymbol{\mathrm{P}})^{\mathrm{T}}=
+\mathrm{Chol}(\boldsymbol{\mathrm{S}}\boldsymbol{\mathrm{R}}\boldsymbol{\mathrm{S}})^{\mathrm{T}}= \left ( \boldsymbol{\mathrm{S}}\boldsymbol{\mathrm{R}}_{\mathrm{L}} \right)^{\mathrm{T}} $$
 
-In this case, $\boldsymbol{Z_{\mathrm{std}}}$ corresponds to `std_dev` and the function `diag_pre_multiply()` first creates a matrix with `sd_zp` on the diagonal, i.e. $\boldsymbol{\mathrm{S}}$, and then multiplies it with the lower Cholesky matrix `R_chol` representing $\boldsymbol{\mathrm{R}}_{\mathrm{L}}$. Although this so-called *non-centered parameterization* may seem like a lot of unnecessary work, separating out the scale and associations of the random effects in this way will often lead to better model convergence and thus more efficient model estimation. Therefore, these mathematically equivalent reparameterizations of the formal model are generally worth implementing although not strictly necessary.
+In this case, $\boldsymbol{Z_{\mathrm{std}}}$ corresponds to `std_dev` and the function `diag_pre_multiply()` first creates a matrix with `sd_zp` on the diagonal, i.e. $\boldsymbol{\mathrm{S}}$, and then multiplies it with the lower Cholesky matrix `R_chol` representing $\boldsymbol{\mathrm{R}}_{\mathrm{L}}$. The `'` symbol applies the transpose operator $^{\mathrm{T}}$. Although this so-called *non-centered parameterization* may seem like a lot of unnecessary work, separating out the scale and associations of the random effects in this way will often lead to better model convergence and thus more efficient model estimation. Therefore, these mathematically equivalent reparameterizations of the formal model are generally worth implementing although not strictly necessary.
 
 ### Model
 
@@ -315,7 +316,7 @@ z_{ij} \sim \mathrm{Normal} \left(\mu^{(z)}_{ij }, \sigma^{(z)}_{ij} \right)  \\
 \end{gathered}
 \end{equation}
 
-The index `ind` is here used to appropriately repeat the random effect values of each RN parameter across repeated observations of the behavior. For example, if the first four observations are for individual 1, so that `ind`={1,1,1,1,2,...}, then `zp_mu[ind]` will repeat the first value of `zp_mu` for the first four observations. This is why it is essentially to correctly match the order of the index and the response vectors.
+The index `ind` is here used to appropriately repeat the random effect values of each RN parameter across repeated observations of the behavior. For example, if the first four observations are for individual 1, so that `ind`={1,1,1,1,2,...}, then `zp_mu[ind]` will repeat the first value of `zp_mu` for the first four observations. This is why it is essential to correctly match the order of the index and the response vectors.
 
 The fitness model can also be specified accordingly
 
@@ -401,7 +402,7 @@ parameters {
 }
 transformed parameters {
   matrix[I,3] zp; //individual phenotypic RN parameter values
-  zp =  std_dev * diag_pre_multiply(sd_zp, R_chol);
+  zp =  std_dev * diag_pre_multiply(sd_zp, R_chol)' ;
 }
 model{
   //separate RN parameters
@@ -434,7 +435,7 @@ model{
   beta_1z ~ normal(0,1);
   theta_0z ~ normal(0,1);
   mu_0 ~ normal(0,1);
-  betas ~ normal(0,1); 
+  betas ~ normal(0,10); 
   
   //random effects
   sd_zp ~ exponential(1);
@@ -452,23 +453,439 @@ vector<lower=0>[3] V_P = sd_zp .* sd_zp; //RN variances
 "mod1.stan")
 
 ```
-
+\pagebreak
 
 ## Estimate model
-...
+
+To estimate this model, we first pass it to Stan for C++ compilation.
+
+```{r message = FALSE}
+#load package
+library(rstan)
+```
+
+```{r eval = FALSE}
+#compiles the model in C++ for MCMC estimation
+mod1 = stan_model("mod1.stan")
+
+#basic settings for rstan
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
+```
+
+The compiled model in `mod1` is now ready to be sampled immediately using Markov Chain Monte Carlo (MCMC), which is accomplished by passing it to the `sampling()` function. For default default MCMC settings in Stan, we could run
+```{r eval = FALSE}
+#sampling posterior dist of the model with default MCMC settings
+results = sampling(object = mod1, data = data)
+```
+However, given that our model is somewhat complex, it is helpful to use custom settings for the sampler that will reduce the risk of poor sampling performance. In particular, we can manually specify that the MCMC sampler should use 1000 iterations per chain to converge on the target joint posterior distribution `warmup=1500`, with the subsequent 1500 iterations/chain used as posterior samples `iter = 3000` (i.e. `iter` - `warmup` = number of MCMC samples per chain). `init = 0` initializes the samplers near null values, which is not necessary but can aid sampling of complex models. Four MCMC chains are used to assess model convergence across independent random samplers `chains=4`, with one core assigned to each chain for parallel processing `cores=4`. The appropriate number of cores to use will be contingent on one's hardware. The `adapt_delta=0.95` argument reduces the risk of divergent transitions during sampling.
+
+```{r eval = FALSE}
+#progress of MCMC chains can be tracked in the viewer pane of RStudio
+results = sampling(object = mod1, data = data, warmup=1500, iter = 3000, init = 0,
+                         chains=4, cores=4, control=list(adapt_delta=0.95) )
+#save model
+saveRDS(results, "results_mod1.RDS")
+```
+```{r echo = FALSE}
+setwd("C:/Users/jormar/Dropbox/Selection-on-RNs")
+results = readRDS("results_mod1.RDS")
+```
+Some readers may note that there is no argument specified for thinning the chain, which implicitly specifies the default argument `thin=1`. Although there are specific contexts where thinning is useful for MCMC sampling, it is generally unnecessary and computationally inefficient [@Link2012].
+
+If you estimate a model in Stan and receive a warning or error, it may indicate issues with the MCMC sampler, which should always be taken seriously. Further description of these and other warnings can be found in the [Stan Warning Guide](https://mc-stan.org/misc/warnings.html). Some warnings can be safely ignored in particular contexts, but efforts should always be taken to first remove the issue before interpreting or reporting results from the sampler. If you receive a warning regarding divergence transitions, a straightforward first step is to increase the `adapt_delta` value closer to 1, e.g. from 0.95 to 0.99. The higher this value, the slower the model will sample but the less likely that divergent iterations will occur. Similarly, if warnings of bulk or tail ESS are received, a first step is to simply let the chains sample for longer by increasing the `iter`, e.g. from 2000 to 2500 or 3000.
+
+Assuming that the sampler worked as intended, we can then extract the posterior MCMC samples from the model.
+
+```{r}
+#extracts posterior estimates
+samples =  extract(results)
+
+#MCMC samples for linear selection coefficients
+head(samples$betas[,1:3])
+```
+
+## Investigate results
+
+Before hypothesis testing, it is useful to visualize the shapes and locations of the posterior distributions of model parameters. There are a variety of ways this can be accomplished. For example, the `bayesplot` package can be used to generate a variety of useful plots.
+```{r message = FALSE}
+library(bayesplot)
+```
+
+```{r}
+#selection coefficients, expected value and 90% CIs
+mcmc_areas(results, pars = c( paste0("betas[",seq(1:9),"]") ), prob = 0.9 )
+```
+\pagebreak
+```{r fig.dim = c(4,4)}
+#variance & corrs of RN parameters, mean and 50% CIs (dark line) and 90% CIs
+mcmc_intervals(results, pars = c( paste0("V_P[",seq(1:3),"]"),"R[1,2]","R[1,3]","R[2,3]" ) )
+```
+
+Point estimates summarizing these posteriors can be quickly generated by summarizing the model.
+```{r}
+#only first 17 parameters, round to ease interpretation
+round(summary(results)$summary[1:17,],2)
+```
+
+The extracted posterior samples can also be manually plotted and summarized using base R functions. For example, we can look at the population average residual variance of behavior $\theta_0^{(z)}$ on the original data scale by manually applying the inverse link function (`exp()`) to the log-scale SD `theta_0z` and subsequently squaring to return the variance.
+
+```{r fig.dim = c(4,4)}
+#discrete approximation of posterior dist
+hist(exp(samples$theta_0z)^2)
+```
+
+The `shinystan` package also provides a very helpful graphical user interface for looking at all aspects of model fit and estimation. Running this code will open a new window in your interrnet browser for looking at the model in greater detail.
+
+```{r eval = FALSE}
+library(shinystan)
+launch_shinystan(results)
+```
 
 ## Hypothesis testing
-...
 
-## Calculating selection differentials
-...
+MCMC not only facilitates sampling complex Bayesian models but also conducting straightforward and direct forms of hypothesis testing. For example, if want to know how much support there is for positive linear and nonlinear selection effects, we simply need to calculate the proportion of the MCMC samples for these parameters with positive magnitude, which approximates the area under the posterior distribution providing support for positive effects.
+```{r}
+#for each column, calculate probability of positive effect
+apply(samples$betas, 2, FUN = function(x) sum(x>0)/length(x) )
+```
+Overall, the model provides consistent support for positive linear and nonlinear selection across the RN parameters, with most effects showing posterior probabilities $\ge$ 0.90. However, the evidence for the quadratic effect of predictability `beta[6]`, or $\beta_6 \left( \theta^{(z)}_j \theta^{(z)}_j \right)$, is much weaker, with a posterior probability of only 0.74 in support of a positive effect, suggesting that there is a 0.26 probability or ~1/4 chance of a negative effect being observed. Another way to think about these probabilities is in relation to Bayesian credible intervals (CIs). In particular, we expect that if there is at least 0.95 probability of a directional effect, the 90% Bayesian CI will exclude zero.
+```{r}
+#for each column, calculate probability of positive effect
+apply(samples$betas, 2, FUN = function(x) quantile(x, c(0.05, 0.95)) ) #90% CI
+```
+We can see, for example, that the lower bound of `beta[5]`, corresponding to $\beta_5\left( \beta^{(z)}_j \beta^{(z)}_j \right)$, is just at the negative boundary of zero, consistent with the posterior probability of 0.949. It is important to emphasize that although 0.95 is a useful heuristic for designating clear evidence of an effect, discretizing this information into "significant" or "non-significant" is generally a waste of information. Put another way, these Bayesian hypothesis tests provides a continuous measure of evidence that should also be interpreted continuously. Much as the difference between significance and non-significance is itself generally not statistically significant [see @McShane2019 for discussion], so too is the difference between e.g. a posterior probability of 0.93 versus 0.97 indicate a transition across a biologically or mathematically meaningful threshold. Thus, much like a null hypothesis test, one should eschew the notion that a posterior probability <0.95 indicates "no evidence of an effect", and instead get comfortable describing varying degrees of support (weak, moderate, and strong) for or against hypothesized effects. Any probability greater than 0.50 provides some support for an effect, but most researchers would be uncomfortable to confidently assert empirical claims without much greater empirical support in their favor, e.g. only a 1/20 chance of an effect in the opposite direction (i.e. a posterior probability of 0.95). Therefore, the posterior probability of 0.74 for a positive `beta[6]` indicates that our data provides *some* evidence for a positive quadratic selection effect on predictability, but this evidence is nonetheless very weak/highly uncertain and warrants cautious description and interpretation. In the opinion of the author, promoting this Bayesian attitude toward evidence within behavioral ecology will be an important tool for promoting the goals of open science, as it may help to dampen file-drawer effects and reduce the risk of p-hacking. A continuous approach to statistical inference also encourages researchers to put greater emphasis on effect sizes, credible intervals, and additional metrics which can collectively increase or decrease the overall "significance" of an empirical finding [@McShane2019].
 
-## Plotting results
-...
+As discussed in @Martin2021a, A variety of other hypotheses can be easily tested for any parameter in the model. For instance, we could ask whether there is support for directional selection on personality being greater than directional selection on plasticity among individuals.
+```{r}
+sum(samples$betas[,1] > samples$betas[,3])/length(samples$betas[,1])
+```
+This value lower than 0.50 indicates that there is 0.52 probability in favor of the plasticity selection effect being greater than the personality effect. As we expect based on simulating equivalent regression coefficients, this indicates little to no evidence in support of a difference between these selection effects. We can also use further pieces of information about the difference of these effect sizes to inform our inferences
+```{r fig.dim = c(4,4)}
+diff = samples$betas[,1] - samples$betas[,3] #posterior of the difference in coefs
+hist(diff) #visualize the posterior
+mean(diff) #expected difference between regression coefs
+mad(diff) #median absolute deviation (robust SD) of expected difference
+quantile(diff, c(0.05,0.95)) #90% CI of expected difference
+```
+We can see that the posterior is centered near zero, with an expected difference of -0.003 and a very wide 90% CI. One might report this in a manuscript by stating that, "Little to no evidence was found for stronger directional selection on personality as compared to plasticity ($\Delta\beta = -0.00, \ \mathrm{MAD}=0.14, \ 90\% \mathrm{CI} [-0.23, 0.23], \ p_+ = 0.48$), suggesting that these RN parameters have equal effects on individual fitness".
+
+If one is so inclined, robust null hypothesis tests can also be conducted within a Bayesian framework by specifying a range of biologically trivial effect sizes. For example, on a standardized scale such as a regression coefficient, values $-0.10<r<0.10$ are considered extremely small, explaining less than 1% of variance in a measure. We might, therefore, think of these as "trivial hypothesis" tests rather than null hypotheses per se. We can comparing these trivial hypothesis tests for the RN parameter correlations with directional hypothesis tests to get distinct pieces of information.
+\pagebreak
+```{r}
+R=samples$R[,,] #3d array, 1 dim = samples, 2 dim = rows, 3 dim = columns
+
+#directional hypothesis tests
+sum(R[,1,2]>0)/length(R[,1,2]) #cor(personality, plasticity)
+sum(R[,1,3]>0)/length(R[,1,3]) #cor(personality, predictability)
+sum(R[,2,3]>0)/length(R[,2,3]) #cor(plasticity, predictability)
+
+#trivial hypothesis tests
+sum(-0.1< R[,1,2] & R[,1,2]  <0.1)/length(R[,1,2]) #cor(personality, plasticity)
+sum(-0.1< R[,1,3] & R[,1,3]  <0.1)/length(R[,1,3]) #cor(personality, predictability)
+sum(-0.1< R[,2,3] & R[,2,3]  <0.1)/length(R[,2,3]) #cor(plasticity, predictability)
+```
+
+Together, these directional and trivial hypothesis tests provide very useful additional sources of information for interpreting the direction and magnitude of the estimated effects. Firstly, we see clear evidence of positive effect sizes for all RN parameter correlations  (probability 0.96-0.99), suggesting that personality, plasticity, and predictability are not developing independently among individuals (and may constrain microevolutionary trajectories as a result). We also see that the correlations between personality and plasticity and between plasticity and predictability are very unlikely to take on trivial effect sizes (probability 0.02-0.03), and thus may be worthy of further attention to explain how and why these correlations arise. However, there is an ~1/3 chance of the correlation between personality and predictability being trivially small, or put the other way, only a 0.66 probability of a non-trivial effect size. Therefore, while there is evidence of a positive correlation between these RN parameters, we cannot be confident that this is association is of a biologically meaningful magnitude.
+
+## Calculate selection differentials
+
+We now want to calculate the total $\Delta_{\mathrm{T}}$ and direct $\Delta_{\mathrm{D}}$ selection differentials on RN parameters, which allows us to consider both the total expected change due to direct and indirect selection as well as the hypothetical expected change due solely to direct selection effects. The total differentials are crucial for capturing patterns of evolutionary constrain or facilitation due to phenotypic integration, while the direct differentials are crucial for testing adaptive hypotheses irrespective of integration among traits. As proposed and explained in @Martin2021a, these differentials are calculated by
+
+\begin{equation} \notag{}\label{}
+\begin{gathered}[t]
+\Delta_{\mathrm{T}} \bar{\boldsymbol{z}}_{\boldsymbol{\mathrm{p}}} =
+\boldsymbol{\mathrm{P}} \boldsymbol{\upbeta}, \\ 
+\Delta_{\mathrm{T}} \boldsymbol{\mathrm{P}} = \boldsymbol{\mathrm{P}} \left( \boldsymbol{\upgamma} - \boldsymbol{ \upbeta \upbeta }^{'} \right) \boldsymbol{\mathrm{P}} \nonumber
+\end{gathered}
+\end{equation}
+
+\begin{equation} \notag{}\label{}
+\begin{gathered}[t]
+\Delta_{\mathrm{D}} \bar{\boldsymbol{z}}_{\boldsymbol{\mathrm{p}}} =
+\boldsymbol{\mathrm{V}} \boldsymbol{\upbeta}, \\ 
+\Delta_{\mathrm{D}} \boldsymbol{\mathrm{V}} = \boldsymbol{\mathrm{V}} \left( \boldsymbol{\upgamma} - \boldsymbol{ \upbeta \upbeta }^{'} \right) \boldsymbol{\mathrm{V}} \nonumber
+\end{gathered}
+\end{equation}
+
+The first step in calculating selection differentials is to appropriately square the quadratic selection effects [@Stinch2008] and to create lists containing each posterior sample of the linear vector $\boldsymbol{ \upbeta}$ and the nonlinear selection matrix $\boldsymbol{\gamma}$. This will ensure that posterior uncertainty in the selection coefficients is pooled across all stages of analysis [@Stinch2014].
+
+```{r}
+betas = samples$betas #all coefficients
+direct = betas[,1:3] #directional gradients
+quad = betas[,4:6]^2 #square to get quadratic gradients
+cor = betas[,7:9] #correlational gradients
+
+#create beta vector
+beta_vec = list() #initialize list of vectors
+for(i in 1:nrow(direct)) {
+  beta_vec[[i]] = matrix(direct[i,],nrow = 3, ncol = 1)
+  }
+
+#create gamma matrix
+gamma_mat = list() #initialize list of matrices
+for(i in 1:nrow(quad)) {
+  #diagonal with quad gradients
+  gamma = diag(quad[i,])
+  #add in off-diagonal elements
+  gamma[1,2] = cor[i,1] #personality, plasticity
+  gamma[1,3] = cor[i,2] #personality, predictability
+  gamma[2,3] = cor[i,3] #plasticity, personality
+  #make symmetric
+  gamma[lower.tri(gamma)] = t(gamma)[lower.tri(gamma)]
+  #add to list
+  gamma_mat[[i]] = gamma
+  }
+```
+
+We then need to create lists of the matrices $\boldsymbol{\mathrm{P}}$ and $\boldsymbol{\mathrm{V}}$ for the total and direct selection differentials respectively.
+
+```{r}
+P = samples$P
+
+#create list of P matrix
+P_mat = list()
+for(i in 1:nrow(P)){
+  P_mat[[i]] = P[i,,]
+  }
+
+#create list of V matrix
+V_mat = list()
+for(i in 1:nrow(P)){
+  V_mat[[i]] = diag(diag(P[i,,]))
+  }
+```
+
+\pagebreak
+The posteriors of the $\Delta_{\mathrm{T}}$ and $\Delta_{\mathrm{D}}$ differentials can now be calculated.
+
+```{r}
+#change in mean
+dT_mean = Map('%*%',P_mat,beta_vec)
+dD_mean = Map('%*%',V_mat,beta_vec)
+
+#change in (co)variance
+dT_vcv = Map('%*%',
+          Map('%*%', P_mat, 
+             Map('-',gamma_mat,
+                 Map('%*%',beta_vec,lapply(beta_vec,t) ))),
+          P_mat )
+dD_vcv = Map('%*%',
+          Map('%*%', V_mat, 
+             Map('-',gamma_mat,
+                 Map('%*%',beta_vec,lapply(beta_vec,t) ))),
+          V_mat )
+
+```
+
+Let's calculate the expectations and uncertainty of the mean differentials.
+
+```{r}
+#expected total mean change (personality, plasticity, predictability)
+apply(simplify2array(dT_mean), 1:2, mean)
+#90% CI for mean change
+apply(simplify2array(dT_mean), 1:2, function(x) quantile(x,c(0.05,0.95)))
+
+#expected direct mean change
+apply(simplify2array(dD_mean), 1:2, mean)
+#90% CI for mean change
+apply(simplify2array(dD_mean), 1:2, function(x) quantile(x,c(0.05,0.95)))
+```
+There is clear evidence that selection is acting to increase the mean levels of the RN parameters for personality, plasticity, and predictability in the population, both directly and indirectly through the effects of phenotypic integration. It is important to note that the predictability parameters $\boldsymbol{\theta}^{(z)}$ are defined formally such that larger values lead to greater residual variance in individual behavior. Therefore, increasing the mean level of this parameter will lead to *less* predictable behavioral responses (i.e. the residual variance gets larger).
+
+For the variances and covariances of these parameters
+```{r}
+#expected total mean change (personality, plasticity, predictability)
+apply(simplify2array(dT_vcv), 1:2, median)
+#90% CI for mean change
+apply(simplify2array(dT_vcv), 1:2, function(x) quantile(x,c(0.05,0.95)))
+
+#expected direct mean change
+apply(simplify2array(dD_vcv), 1:2, median)
+#90% CI for mean change
+apply(simplify2array(dD_vcv), 1:2, function(x) quantile(x,c(0.05,0.95)))
+```
+Note that the 90% CIs are calculated across the columns of the $\Delta_{\mathrm{T}} \boldsymbol{\mathrm{P}}$ and $\Delta_{\mathrm{D}} \boldsymbol{\mathrm{P}}$ matrices. We find evidence that both direct and indirect selection are increasing the correlations of the RN parameters. While it is also expected that the total effect of selection will increase trait variance, the direct effect of selection on trait variances is less certain and much smaller. It is notable as well that the effects of direct selection are expected to be slightly negative thought extremely small for the variance of predictability. Phenotypic integration is thus leading to greater maintenance of individual variation and trait correlations than would otherwise be expected by the direct effects of selection alone.
+
+## Plot results
+
+While it is helpful to summarize the differentials with point estimates, the models provide posterior distributions that can be also plotted and visually interpreted to gain a fuller sense of the uncertainty in these estimates. We'd also like to know how the expected within-generation changes of each RN parameter will change the overall shape of the behavioral RN within the population. First we'll consider plotting the differentials for RN parameters. As argued in @Martin2021a, it is helpful to separately visualize the expected change in means, trait variance, and trait correlations, as each provides unique information relevant for testing adaptive hypotheses. First we need to create dataframes in long format for plotting.
+
+```{r}
+#change in means (list to matrix)
+dT_mean = matrix(unlist(dT_mean), nrow=length(dT_mean), ncol=3, byrow=TRUE,
+                 dimnames = list(1:length(dT_mean), c("pers","plst","pred")))
+dD_mean = matrix(unlist(dD_mean), nrow=length(dD_mean), ncol=3, byrow=TRUE,
+                 dimnames = list(1:length(dD_mean), c("pers","plst","pred")))
+
+#separate change in variance from covariance
+dT_V = matrix(unlist(lapply(dT_vcv,diag)), nrow=length(dT_vcv), ncol=3, byrow=TRUE,
+              dimnames = list(1:length(dT_vcv), c("pers","plst","pred")))
+#dT_S = sqrt(abs(dT_V))*sign(dT_V) #change in SD (abs to avoid negative sqrt)
+dD_V = matrix(unlist(lapply(dD_vcv,diag)), nrow=length(dD_vcv), ncol=3, byrow=TRUE,
+              dimnames = list(1:length(dD_vcv), c("pers","plst","pred")))
+#dD_S = sqrt(abs(dD_V))*sign(dD_V) 
+
+#change in correlations
+dT_R = matrix(unlist(lapply(dT_vcv,FUN = function(x) x[lower.tri(x)])),
+                      nrow=length(dT_vcv), ncol=3, byrow=TRUE,
+              dimnames = list(1:length(dT_vcv), c("pers_plst","pers_pred","plst_pred")))
+dD_R = matrix(unlist(lapply(dD_vcv,FUN = function(x) x[lower.tri(x)])),
+                      nrow=length(dD_vcv), ncol=3, byrow=TRUE,
+              dimnames = list(1:length(dD_vcv), c("pers_plst","pers_pred","plst_pred")))
+
+#wide to long for plotting
+library(reshape)
+dT_meanl = melt(dT_mean)
+dD_meanl = melt(dD_mean)
+d_meanl = rbind(dT_meanl,dD_meanl) #combine
+d_meanl$type = rep(c("T","D"), each = nrow(dT_meanl))
+
+dT_Vl = melt(dT_V)
+dD_Vl = melt(dD_V)
+d_Vl = rbind(dT_Vl,dD_Vl)
+d_Vl$type = rep(c("T","D"), each = nrow(dT_Vl))
+
+dT_Rl = melt(dT_R)
+dD_Rl = melt(dD_R)
+d_Rl = rbind(dT_Rl,dD_Rl)
+d_Rl$type = rep(c("T","D"), each = nrow(dT_Rl))
+```
+
+The data are now ready for plotting.
+
+```{r fig.dim = c(8,3)}
+library(ggplot2)
+
+#mean differentials
+ggplot(d_meanl, aes( x = value, color = type, fill = type)) + 
+  geom_density(aes(y=..scaled..), size = 0.9, alpha = 0.10) + 
+  facet_grid(. ~ X2)+
+  scale_color_manual(values=c("#4db4d1","#4dd191"))+
+  geom_vline(xintercept = 0, linetype = "dashed", size = 0.5)+
+  xlab( bquote(atop("", paste(Delta,bold(bar(z))[p] ))))+
+  scale_fill_manual(values=c("#4dd191","#4db4d1"))
+```
+
+```{r fig.dim = c(8,3)}
+library(ggplot2)
+
+#variance differentials
+ggplot(d_Vl, aes( x = value, color = type, fill = type)) + 
+  geom_density(aes(y=..scaled..), size = 0.9, alpha = 0.10) + 
+  facet_grid(. ~ X2)+
+  scale_color_manual(values=c("#4db4d1","#4dd191"))+
+  geom_vline(xintercept = 0, linetype = "dashed", size = 0.5)+
+  xlab( bquote(atop("",paste(Delta,bold(V)[z[p]] ))))+
+  scale_fill_manual(values=c("#4dd191","#4db4d1"))
+```
+```{r fig.dim = c(8,3)}
+library(ggplot2)
+
+#correlation differentials
+ggplot(d_Rl, aes( x = value, color = type, fill = type)) + 
+  geom_density(aes(y=..scaled..), size = 0.9, alpha = 0.10) + 
+  facet_grid(. ~ X2)+
+  scale_color_manual(values=c("#4db4d1","#4dd191"))+
+  geom_vline(xintercept = 0, linetype = "dashed", size = 0.5)+
+  xlab( bquote(atop("",paste(Delta,bold(R)[z[p]] ))))+
+  scale_fill_manual(values=c("#4dd191","#4db4d1"))
+```
+To visualize the full population RNs, we need to first add the original population values $\mu_0^{(z)}$, $\beta_1^{(z)}$, and $\theta_0^{(z)}$ to the $\Delta_{\mathrm{T}}$ and $\Delta_{\mathrm{D}}$ to get absolute values following the selection event. We can then use point estimates of these posteriors to generate a single plot of the RN function.
+
+```{r}
+#personality (pop intercept mu)
+mu = median(samples$mu_0z) #linear w/o link function
+T_mu = median(dT_mean[,1]) #following selection
+D_mu = median(dD_mean[,1])
+
+#plasticity (pop slope beta)
+beta = median(samples$beta_1z)
+T_beta = median(samples$beta_1z + dT_mean[,2])
+D_beta = median(samples$beta_1z + dD_mean[,2])
+
+#predictability (sigma)
+theta = median(exp(samples$theta_0z))
+#exp inverse link on absolute value on the log scale
+T_theta = median(exp(samples$theta_0z + dT_mean[,3]))
+D_theta = median(exp(samples$theta_0z + dD_mean[,3]))
+
+```
+
+We create an arbitrary environmental covariate for visualizing the population RN before and after selection
+
+```{r}
+x = seq(-1,1,by = 0.05)
+```
+
+and calculate the 90% or 95% CI for the RN.
+
+```{r}
+#before selection
+y_low = mu + beta*x -1.96*theta #1.96 = 95% CI
+y_high = mu + beta*x +1.96*theta
+
+#after selection
+Ty_low = T_mu + T_beta*x -1.96*T_theta
+Ty_high = T_mu + T_beta*x +1.96*T_theta
+
+Dy_low = D_mu + D_beta*x -1.96*D_theta
+Dy_high = D_mu + D_beta*x +1.96*D_theta
+```
+
+We're now ready for plotting.
+
+```{r fig.dim = c(4,4)}
+ggplot() +
+  coord_cartesian(xlim=c(-1, 1), ylim=c(-2, 2)) +
+  scale_x_continuous(expand = c(0, 0), breaks = c(-1,0,1),
+                     labels = c(-1,0,1) )+
+  scale_y_continuous(expand = c(0, 0), breaks = c(-1,0,1),
+                     labels = c(-1,0,1) ) +
+  geom_hline(yintercept=0,linetype="dashed", alpha = 0.25)+
+  geom_vline(xintercept=0,linetype="dashed", alpha = 0.25) +
+  
+  geom_abline(intercept = mu, slope = beta, size = 2, alpha =0.75, color = "darkgrey") +
+  geom_ribbon(aes(x = x, y = mu + beta*x, ymin = y_low, ymax = y_high),
+              size = 0.8, linetype = 5, alpha = 0.15, color = "darkgrey", fill = "darkgrey")+
+  
+  geom_abline(intercept = T_mu, slope = T_beta, size = 2, color = "#23a666") +
+  geom_ribbon(aes(x = x, y = T_mu + T_beta*x, ymin = Ty_low, ymax = Ty_high),
+              size = 0.8, linetype = 5, alpha = 0.15, color = "#23a666", fill = "#4dd191")+
+  xlab("\nEnvironment")+
+  ylab("Behavior")+
+  ggtitle(expression(paste(bold(Delta[T]),bold(" Population-Level Behavioral RN"))))+
+        guides(fill=FALSE, color=FALSE)
+```
+
+```{r fig.dim = c(4,4)}
+ggplot() +
+  coord_cartesian(xlim=c(-1, 1), ylim=c(-2, 2)) +
+  scale_x_continuous(expand = c(0, 0), breaks = c(-1,0,1),
+                     labels = c(-1,0,1) )+
+  scale_y_continuous(expand = c(0, 0), breaks = c(-1,0,1),
+                     labels = c(-1,0,1) ) +
+  geom_hline(yintercept=0,linetype="dashed", alpha = 0.25)+
+  geom_vline(xintercept=0,linetype="dashed", alpha = 0.25) +
+  
+  geom_abline(intercept = mu, slope = beta, size = 2, alpha =0.75, color = "darkgrey") +
+  geom_ribbon(aes(x = x, y = mu + beta*x, ymin = y_low, ymax = y_high),
+              size = 0.8, linetype = 5, alpha = 0.15, color = "darkgrey", fill = "darkgrey")+
+  
+  geom_abline(intercept = D_mu, slope = D_beta, size = 2, color = "#0586ab") +
+  geom_ribbon(aes(x = x, y = D_mu + D_beta*x, ymin = Dy_low, ymax = Dy_high),
+              size = 0.8, linetype = 5, alpha = 0.15, color = "#0586ab", fill = "#0586ab")+
+  xlab("\nEnvironment")+
+  ylab("Behavior")+
+  ggtitle(expression(paste(bold(Delta[D]),bold(" Population-Level Behavioral RN"))))+
+        guides(fill=FALSE, color=FALSE)
+```
+
+As in the main text, grey is used to indicate the current population RN. Overall, we can see that direct selection is expected to have a fairly negligible impact on the population RN, with total selection leading to a small but more apparent increase in personality (RN intercept) and plasticity (RN slope). For both direct and total selection, there is also an increase in the magnitude of the predictability parameter (RN dispersion/shaded band), suggesting that individuals' behavior will become slightly more random in the population.
 
 # Forthcoming tutorials
 
-Further examples will be added in the coming months for simplifying the full model (e.g. only considering selection on personality), estimating non-Gaussian response models and selection gradients, introducing repeated fitness measures, and including structural equation models.
+Further examples will be added in the future for simplifying the full model (e.g. only considering selection on personality), estimating non-Gaussian response models and selection gradients, introducing repeated fitness measures, and including structural equation models.
 
 \pagebreak
 

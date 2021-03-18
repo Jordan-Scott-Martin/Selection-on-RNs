@@ -22,7 +22,7 @@ parameters {
 }
 transformed parameters {
   matrix[I,3] zp; //individual phenotypic RN parameter values
-  zp =  std_dev * diag_pre_multiply(sd_zp, R_chol);
+  zp =  std_dev * diag_pre_multiply(sd_zp, R_chol)' ;
 }
 model{
   //separate RN parameters
@@ -52,7 +52,7 @@ model{
   mu_0z ~ normal(0,1);
   beta_1z ~ normal(0,1);
   theta_0z ~ normal(0,1);
-  mu_0 ~ normal(0,1);
+  mu_0 ~ normal(1,1);
   betas ~ normal(0,1); 
   
   //random effects

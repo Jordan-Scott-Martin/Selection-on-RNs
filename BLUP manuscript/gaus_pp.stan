@@ -22,7 +22,7 @@ parameters {
 }
 transformed parameters {
   matrix[I,2] zp; //individual phenotypic RN parameter values
-  zp =  std_dev * diag_pre_multiply(sd_P, LP);
+  zp =  std_dev * diag_pre_multiply(sd_P, LP)' ;
 }
 model{
   //separate RN parameters

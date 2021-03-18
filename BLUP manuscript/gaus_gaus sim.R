@@ -1,7 +1,5 @@
 #load packages
 library(mvtnorm)
-#library(rstan)
-#library(shinystan)
 
 ## increase memory to avoid crashing with loop
 memory.limit(size=100000)
@@ -318,6 +316,18 @@ apply(p500.3_pw, 2, function(x) sum(x>0.95)/length(x))
 
 
 #################################################################
+#################################################################
+#################################################################
+#################################################################
+
+
+#...
+
+#################################################################
+#################################################################
+#################################################################
+#################################################################
+#################################################################
 #Personality + plasticity, N 100, 3
 #################################################################
 I = 100; repm = 3; sim = 200
@@ -400,6 +410,53 @@ for(i in 1:sim){
 apply(pp500.3_pw, 2, function(x) sum(x>0.95)/length(x)) 
 
 #################################################################
+#Personality + plasticity, N 700, 3
+#################################################################
+I = 700; repm = 3; sim = 200
+
+df.pp700.3 = list()
+for(i in 1:sim){
+  df.pp700.3[[i]] = sim_pp(cor,sd,beta,res,popint,popslope,popdisp,N,repm) }
+saveRDS(df.pp700.3, "df_pp700.3.RDS")
+
+#compile Stan model
+mod = rstan::stan_model(file="gaus_pp.stan")
+
+#MCMC settings
+n_iter <- 2000
+n_warm <- 1000
+n_chains <- 4
+
+#dataframe for results
+pp700.3_pw = data.frame(iter = seq(1:sim), pb1 = NA, pb2 = NA, pb3 = NA, pb4 = NA, pb5 = NA) 
+
+#estimate models
+for(i in 1:sim){
+  df = df.pp700.3[[i]]
+  est_mod <- rstan::sampling(mod, data=df, init="0", iter=n_iter, warmup=n_warm, seed = i, 
+                             chains=n_chains, cores=n_chains, control=list(adapt_delta=0.99, max_treedepth=10))
+  #posterior samples
+  post = rstan::extract(est_mod)
+  
+  #selection gradients
+  betas = data.frame(post[grepl("betas", names(post)) ] )
+  pp700.3_pw[i,"pb1"] = sum(sign(df$betas[1])==sign(betas[,1]))/length(betas[,1])
+  pp700.3_pw[i,"pb2"] = sum(sign(df$betas[2])==sign(betas[,2]))/length(betas[,2])
+  pp700.3_pw[i,"pb3"] = sum(sign(df$betas[3])==sign(betas[,3]))/length(betas[,3])
+  pp700.3_pw[i,"pb4"] = sum(sign(df$betas[4])==sign(betas[,4]))/length(betas[,4])
+  pp700.3_pw[i,"pb5"] = sum(sign(df$betas[5])==sign(betas[,5]))/length(betas[,5])
+  saveRDS(pp700.3_pw,"pp700_3pw.RDS")
+}
+
+apply(pp700.3_pw, 2, function(x) sum(x>0.95)/length(x)) 
+
+
+#################################################################
+#################################################################
+#################################################################
+#################################################################
+
+#################################################################
 #Personality + plasticity, N 500, 6
 #################################################################
 I = 500; repm = 6; sim = 200
@@ -439,48 +496,6 @@ for(i in 1:sim){
 }
 
 apply(pp500.6_pw, 2, function(x) sum(x>0.95)/length(x)) 
-
-#################################################################
-#Personality + plasticity, N 500, 9
-#################################################################
-I = 500; repm = 9; sim = 200
-
-df.pp500.9 = list()
-for(i in 1:sim){
-  df.pp500.9[[i]] = sim_pp(cor,sd,beta,res,popint,popslope,popdisp,N,repm) }
-saveRDS(df.pp500.9, "df_pp500_9.RDS")
-
-#compile Stan model
-mod = rstan::stan_model(file="gaus_pp.stan")
-
-#MCMC settings
-n_iter <- 2000
-n_warm <- 1000
-n_chains <- 4
-
-#dataframe for results
-pp500.9_pw = data.frame(iter = seq(1:sim), pb1 = NA, pb2 = NA, pb3 = NA, pb4 = NA, pb5 = NA) 
-
-#estimate models
-for(i in 1:sim){
-  df = df.pp500.9[[i]]
-  est_mod <- rstan::sampling(mod, data=df, init="0", iter=n_iter, warmup=n_warm, seed = i, 
-                             chains=n_chains, cores=n_chains, control=list(adapt_delta=0.99, max_treedepth=10))
-  #posterior samples
-  post = rstan::extract(est_mod)
-  
-  #selection gradients
-  betas = data.frame(post[grepl("betas", names(post)) ] )
-  pp500.9_pw[i,"pb1"] = sum(sign(df$betas[1])==sign(betas[,1]))/length(betas[,1])
-  pp500.9_pw[i,"pb2"] = sum(sign(df$betas[2])==sign(betas[,2]))/length(betas[,2])
-  pp500.9_pw[i,"pb3"] = sum(sign(df$betas[3])==sign(betas[,3]))/length(betas[,3])
-  pp500.9_pw[i,"pb4"] = sum(sign(df$betas[4])==sign(betas[,4]))/length(betas[,4])
-  pp500.9_pw[i,"pb5"] = sum(sign(df$betas[5])==sign(betas[,5]))/length(betas[,5])
-  saveRDS(pp500.9_pw,"pp500_9pw.RDS")
-}
-
-apply(pp500.9_pw, 2, function(x) sum(x>0.95)/length(x)) 
-
 
 #################################################################
 #Personality + plasticity, N 600, 6
@@ -524,90 +539,7 @@ for(i in 1:sim){
 apply(pp600.6_pw, 2, function(x) sum(x>0.95)/length(x)) 
 
 #################################################################
-#Personality + plasticity, N 600, 9
-#################################################################
-I = 600; repm = 9; sim = 200
-
-df.pp600.9 = list()
-for(i in 1:sim){
-  df.pp600.9[[i]] = sim_pp(cor,sd,beta,res,popint,popslope,popdisp,N,repm) }
-saveRDS(df.pp600.9, "df_pp600_9.RDS")
-
-#compile Stan model
-mod = rstan::stan_model(file="gaus_pp.stan")
-
-#MCMC settings
-n_iter <- 2000
-n_warm <- 1000
-n_chains <- 4
-
-#dataframe for results
-pp600.9_pw = data.frame(iter = seq(1:sim), pb1 = NA, pb2 = NA, pb3 = NA, pb4 = NA, pb5 = NA) 
-
-#estimate models
-for(i in 1:sim){
-  df = df.pp600.9[[i]]
-  est_mod <- rstan::sampling(mod, data=df, init="0", iter=n_iter, warmup=n_warm, seed = i, 
-                             chains=n_chains, cores=n_chains, control=list(adapt_delta=0.99, max_treedepth=10))
-  #posterior samples
-  post = rstan::extract(est_mod)
-  
-  #selection gradients
-  betas = data.frame(post[grepl("betas", names(post)) ] )
-  pp600.9_pw[i,"pb1"] = sum(sign(df$betas[1])==sign(betas[,1]))/length(betas[,1])
-  pp600.9_pw[i,"pb2"] = sum(sign(df$betas[2])==sign(betas[,2]))/length(betas[,2])
-  pp600.9_pw[i,"pb3"] = sum(sign(df$betas[3])==sign(betas[,3]))/length(betas[,3])
-  pp600.9_pw[i,"pb4"] = sum(sign(df$betas[4])==sign(betas[,4]))/length(betas[,4])
-  pp600.9_pw[i,"pb5"] = sum(sign(df$betas[5])==sign(betas[,5]))/length(betas[,5])
-  saveRDS(pp600.9_pw,"pp600_9pw.RDS")
-}
-
-apply(pp600.9_pw, 2, function(x) sum(x>0.95)/length(x)) 
-
-#################################################################
-#Personality + plasticity, N 700, 3
-#################################################################
-I = 700; repm = 3; sim = 200
-
-df.pp700.3 = list()
-for(i in 1:sim){
-  df.pp700.3[[i]] = sim_pp(cor,sd,beta,res,popint,popslope,popdisp,N,repm) }
-saveRDS(df.pp700.3, "df_pp700.3.RDS")
-
-#compile Stan model
-mod = rstan::stan_model(file="gaus_pp.stan")
-
-#MCMC settings
-n_iter <- 2000
-n_warm <- 1000
-n_chains <- 4
-
-#dataframe for results
-pp700.3_pw = data.frame(iter = seq(1:sim), pb1 = NA, pb2 = NA, pb3 = NA, pb4 = NA, pb5 = NA) 
-
-#estimate models
-for(i in 1:sim){
-  df = df.pp700.3[[i]]
-  est_mod <- rstan::sampling(mod, data=df, init="0", iter=n_iter, warmup=n_warm, seed = i, 
-                             chains=n_chains, cores=n_chains, control=list(adapt_delta=0.99, max_treedepth=10))
-  #posterior samples
-  post = rstan::extract(est_mod)
-  
-  #selection gradients
-  betas = data.frame(post[grepl("betas", names(post)) ] )
-  pp700.3_pw[i,"pb1"] = sum(sign(df$betas[1])==sign(betas[,1]))/length(betas[,1])
-  pp700.3_pw[i,"pb2"] = sum(sign(df$betas[2])==sign(betas[,2]))/length(betas[,2])
-  pp700.3_pw[i,"pb3"] = sum(sign(df$betas[3])==sign(betas[,3]))/length(betas[,3])
-  pp700.3_pw[i,"pb4"] = sum(sign(df$betas[4])==sign(betas[,4]))/length(betas[,4])
-  pp700.3_pw[i,"pb5"] = sum(sign(df$betas[5])==sign(betas[,5]))/length(betas[,5])
-  saveRDS(pp700.3_pw,"pp700_3pw.RDS")
-}
-
-apply(pp700.3_pw, 2, function(x) sum(x>0.95)/length(x)) 
-
-
-#################################################################
-#Personality + plasticity, N 700, 3
+#Personality + plasticity, N 700, 6
 #################################################################
 I = 700; repm = 6; sim = 200
 
@@ -647,27 +579,27 @@ for(i in 1:sim){
 
 apply(pp700.6_pw, 2, function(x) sum(x>0.95)/length(x)) 
 
-
-
-
-
-
-
 #################################################################
 #################################################################
 #################################################################
-##########################################
-#Personality only, N 100, 6
-##########################################
-I = 100; repm = 6; sim = 200
+#################################################################
 
-df.p100.6 = list()
+
+#...
+
+
+#################################################################
+#PPP, N 500, 6
+#################################################################
+I = 500; repm = 6; sim = 200
+
+df.ppp500.6 = list()
 for(i in 1:sim){
-  df.p100.6[[i]] = sim_p(cor,sd,beta,res,popint,popslope,popdisp,N,repm) }
-saveRDS(df.p100.6, "df_p100_6.RDS")
+  df.ppp500.6[[i]] = sim_ppp(cor,sd,beta,res,popint,popslope,popdisp,N,repm) }
+saveRDS(df.ppp500.6, "df_ppp500.6.RDS")
 
 #compile Stan model
-mod = rstan::stan_model(file="gaus_p.stan")
+mod = rstan::stan_model(file="gaus_ppp.stan")
 
 #MCMC settings
 n_iter <- 2000
@@ -675,11 +607,11 @@ n_warm <- 1000
 n_chains <- 4
 
 #dataframe for results
-p100.6_pw = data.frame(iter = seq(1:sim), pb1 = NA, pb2 = NA) 
+ppp500.6_pw = data.frame(iter = seq(1:sim), pb1 = NA, pb2 = NA, pb3 = NA, pb4 = NA, pb5 = NA) 
 
 #estimate models
 for(i in 1:sim){
-  df = df.p100.6[[i]]
+  df = df.ppp500.6[[i]]
   est_mod <- rstan::sampling(mod, data=df, init="0", iter=n_iter, warmup=n_warm, seed = i, 
                              chains=n_chains, cores=n_chains, control=list(adapt_delta=0.99, max_treedepth=10))
   #posterior samples
@@ -687,35 +619,40 @@ for(i in 1:sim){
   
   #selection gradients
   betas = data.frame(post[grepl("betas", names(post)) ] )
-  p100.6_pw[i,"pb1"] = sum(sign(df$betas[1])==sign(betas[,1]))/length(betas[,1])
-  p100.6_pw[i,"pb2"] = sum(sign(df$betas[2])==sign(betas[,2]))/length(betas[,2])
-  saveRDS(p100.6_pw,"p100_6pw.RDS")
+  ppp500.6_pw[i,"pb1"] = sum(sign(df$betas[1])==sign(betas[,1]))/length(betas[,1])
+  ppp500.6_pw[i,"pb2"] = sum(sign(df$betas[2])==sign(betas[,2]))/length(betas[,2])
+  ppp500.6_pw[i,"pb3"] = sum(sign(df$betas[3])==sign(betas[,3]))/length(betas[,3])
+  ppp500.6_pw[i,"pb4"] = sum(sign(df$betas[4])==sign(betas[,4]))/length(betas[,4])
+  ppp500.6_pw[i,"pb5"] = sum(sign(df$betas[5])==sign(betas[,5]))/length(betas[,5])
+  saveRDS(ppp500.6_pw,"ppp500.6pw.RDS")
 }
 
-##########################################
-#Personality only, N 100, 9
-##########################################
-#I = 100; repm = 9; sim = 200
-#
-#df.p100.9 = list()
-#for(i in 1:sim){
-  df.p100.9[[i]] = sim_p(cor,sd,beta,res,popint,popslope,popdisp,N,repm) }
-#saveRDS(df.p100.9, "df_p100_9.RDS")
+apply(ppp500.6_pw, 2, function(x) sum(x>0.95)/length(x)) 
+
+#################################################################
+#PPP, N 600, 6
+#################################################################
+I = 600; repm = 6; sim = 200
+
+df.ppp600.6 = list()
+for(i in 1:sim){
+  df.ppp600.6[[i]] = sim_ppp(cor,sd,beta,res,popint,popslope,popdisp,N,repm) }
+saveRDS(df.ppp600.6, "df_ppp600.6.RDS")
 
 #compile Stan model
-#mod = rstan::stan_model(file="gaus_p.stan")
+mod = rstan::stan_model(file="gaus_ppp.stan")
 
 #MCMC settings
-#n_iter <- 2000
-#n_warm <- 1000
-#n_chains <- 4
+n_iter <- 2000
+n_warm <- 1000
+n_chains <- 4
 
 #dataframe for results
-#p100.9_pw = data.frame(iter = seq(1:sim), pb1 = NA, pb2 = NA) 
+ppp600.6_pw = data.frame(iter = seq(1:sim), pb1 = NA, pb2 = NA, pb3 = NA, pb4 = NA, pb5 = NA) 
 
 #estimate models
-#for(i in 1:sim){
-  df = df.p100.9[[i]]
+for(i in 1:sim){
+  df = df.ppp600.6[[i]]
   est_mod <- rstan::sampling(mod, data=df, init="0", iter=n_iter, warmup=n_warm, seed = i, 
                              chains=n_chains, cores=n_chains, control=list(adapt_delta=0.99, max_treedepth=10))
   #posterior samples
@@ -723,14 +660,24 @@ for(i in 1:sim){
   
   #selection gradients
   betas = data.frame(post[grepl("betas", names(post)) ] )
-  p100.9_pw[i,"pb1"] = sum(sign(df$betas[1])==sign(betas[,1]))/length(betas[,1])
-  p100.9_pw[i,"pb2"] = sum(sign(df$betas[2])==sign(betas[,2]))/length(betas[,2])
-  saveRDS(p100.9_pw,"p100_9pw.RDS")
+  ppp600.6_pw[i,"pb1"] = sum(sign(df$betas[1])==sign(betas[,1]))/length(betas[,1])
+  ppp600.6_pw[i,"pb2"] = sum(sign(df$betas[2])==sign(betas[,2]))/length(betas[,2])
+  ppp600.6_pw[i,"pb3"] = sum(sign(df$betas[3])==sign(betas[,3]))/length(betas[,3])
+  ppp600.6_pw[i,"pb4"] = sum(sign(df$betas[4])==sign(betas[,4]))/length(betas[,4])
+  ppp600.6_pw[i,"pb5"] = sum(sign(df$betas[5])==sign(betas[,5]))/length(betas[,5])
+  saveRDS(ppp600.6_pw,"ppp600.6pw.RDS")
 }
 
-##########################################
-#Personality only, I 100, 3,6,9 plot
-##########################################
+apply(ppp600.6_pw, 2, function(x) sum(x>0.95)/length(x)) 
+
+#################################################################
+#################################################################
+#################################################################
+#################################################################
+
+#plot
+
+
 p100.3_pw = readRDS("p100_3pw.RDS")
 p100.6_pw = readRDS("p100_6pw.RDS")
 #p100.9_pw = readRDS("p100_9pw.RDS")

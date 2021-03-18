@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2021.3.10)  15 MAR 2021 16:44
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2021.3.18)  18 MAR 2021 17:57
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -312,17 +312,17 @@ Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
 ))
 (c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/microtype/microty
 pe.sty
-Package: microtype 2021/02/25 v2.8b Micro-typographical refinements (RS)
+Package: microtype 2021/03/14 v2.8c Micro-typographical refinements (RS)
 \MT@toks=\toks20
 \MT@count=\count270
-LaTeX Info: Redefining \textls on input line 788.
+LaTeX Info: Redefining \textls on input line 790.
 \MT@outer@kern=\dimen164
-LaTeX Info: Redefining \textmicrotypecontext on input line 1358.
+LaTeX Info: Redefining \textmicrotypecontext on input line 1374.
 \MT@listname@count=\count271
 
 (c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/microtype/microty
 pe-pdftex.def
-File: microtype-pdftex.def 2021/02/25 v2.8b Definitions specific to pdftex (RS)
+File: microtype-pdftex.def 2021/03/14 v2.8c Definitions specific to pdftex (RS)
 
 LaTeX Info: Redefining \lsstyle on input line 915.
 LaTeX Info: Redefining \lslig on input line 915.
@@ -332,7 +332,7 @@ Package microtype Info: Loading configuration file microtype.cfg.
 
 (c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/microtype/microty
 pe.cfg
-File: microtype.cfg 2021/02/25 v2.8b microtype main configuration file (RS)
+File: microtype.cfg 2021/03/14 v2.8c microtype main configuration file (RS)
 ))
 (c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lipsum/lipsum.sty
 
@@ -780,10 +780,10 @@ Package microtype Info: Loading generic protrusion settings for font family
 
 {c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdft
 ex.map}]
-<fig1.pdf, id=130, 614.295pt x 397.485pt>
+<fig1.pdf, id=129, 614.295pt x 397.485pt>
 File: fig1.pdf Graphic file (type pdf)
 <use fig1.pdf>
-Package pdftex.def Info: fig1.pdf  used on input line 233.
+Package pdftex.def Info: fig1.pdf  used on input line 231.
 (pdftex.def)             Requested size: 491.43666pt x 317.98842pt.
 
 Underfull \vbox (badness 1783) has occurred while \output is active []
@@ -792,28 +792,28 @@ Underfull \vbox (badness 1783) has occurred while \output is active []
 Underfull \vbox (badness 4144) has occurred while \output is active []
 
 [4]
-<fig2.pdf, id=271, 794.97pt x 505.89pt>
+<fig2.pdf, id=267, 794.97pt x 505.89pt>
 File: fig2.pdf Graphic file (type pdf)
 <use fig2.pdf>
-Package pdftex.def Info: fig2.pdf  used on input line 473.
+Package pdftex.def Info: fig2.pdf  used on input line 471.
 (pdftex.def)             Requested size: 556.4752pt x 354.12057pt.
 
-Overfull \hbox (39.15012pt too wide) in paragraph at lines 472--477
+Overfull \hbox (39.15012pt too wide) in paragraph at lines 470--475
 []|  [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 477--477
+Underfull \hbox (badness 10000) in paragraph at lines 475--475
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 477--477
+Underfull \hbox (badness 10000) in paragraph at lines 475--475
 
  []
 
 
-Underfull \hbox (badness 1072) in paragraph at lines 477--477
+Underfull \hbox (badness 1072) in paragraph at lines 475--475
 []$\T1/lmr/m/n/10 (+20) . Pat-terns of non-lin-ear se-lec-tion on two be-hav-io
 ral RN pa-ram-e-ters $[]$ and $[]$.
  []
@@ -825,7 +825,7 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 fier (name{equation.3.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.611 \begin{equation}
+l.606 \begin{equation}
                        \tag{1.2}\label{eq:1.2}pdfTeX warning (ext4): destinatio
 n with the same identifier (name{equation.3.1}) has been already used, duplicat
 e ignored
@@ -862,28 +862,28 @@ l.964 variances. \begin{equation}
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 [12]
-<fig3_2.pdf, id=460, 722.7pt x 505.89pt>
+<fig3_2.pdf, id=456, 722.7pt x 505.89pt>
 File: fig3_2.pdf Graphic file (type pdf)
 <use fig3_2.pdf>
-Package pdftex.def Info: fig3_2.pdf  used on input line 1120.
+Package pdftex.def Info: fig3_2.pdf  used on input line 1118.
 (pdftex.def)             Requested size: 527.5666pt x 369.29662pt.
 
-Overfull \hbox (14.50925pt too wide) in paragraph at lines 1119--1124
+Overfull \hbox (14.50925pt too wide) in paragraph at lines 1117--1122
 []|  [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1124--1124
+Underfull \hbox (badness 10000) in paragraph at lines 1122--1122
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1124--1124
+Underfull \hbox (badness 10000) in paragraph at lines 1122--1122
 
  []
 
 
-LaTeX Warning: Float too large for page by 13.63313pt on input line 1126.
+LaTeX Warning: Float too large for page by 13.63313pt on input line 1124.
 
 [13] [14 <./fig3_2.pdf>]
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -910,16 +910,16 @@ No file BLUP-manuscript-v1.bbl.
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `BLUP-manuscript-v1.out' has not changed.
-(rerunfilecheck)             Checksum: F81B08F5E2E2AF43C7AEC3ED7157CA3D;3063.
+(rerunfilecheck)             Checksum: 7E6E3533F5D0DA97DADE75B5AB7F7161;3147.
  ) 
 Here is how much of TeX's memory you used:
- 14050 strings out of 480971
- 225082 string characters out of 5906168
- 699362 words of memory out of 5000000
- 30633 multiletter control sequences out of 15000+600000
- 474909 words of font info for 176 fonts, out of 8000000 for 9000
+ 14062 strings out of 480962
+ 225402 string characters out of 5905904
+ 699335 words of memory out of 5000000
+ 30650 multiletter control sequences out of 15000+600000
+ 475064 words of font info for 178 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 83i,16n,88p,3258b,432s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 83i,16n,88p,3243b,427s stack positions out of 5000i,500n,10000p,200000b,80000s
 {c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.
 enc}{c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-m
 athsy.enc}{c:/Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/l
@@ -948,10 +948,10 @@ mar/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy5.pfb><c:/User
 s/jormar/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb><c:
 /Users/jormar/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.p
 fb>
-Output written on BLUP-manuscript-v1.pdf (21 pages, 573262 bytes).
+Output written on BLUP-manuscript-v1.pdf (21 pages, 571638 bytes).
 PDF statistics:
- 705 PDF objects out of 1000 (max. 8388607)
- 649 compressed objects within 7 object streams
+ 701 PDF objects out of 1000 (max. 8388607)
+ 645 compressed objects within 7 object streams
  158 named destinations out of 1000 (max. 500000)
  35464 words of extra memory for PDF output out of 35830 (max. 10000000)
 
