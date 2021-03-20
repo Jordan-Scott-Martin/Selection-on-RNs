@@ -434,7 +434,7 @@ model{
   beta_1z ~ normal(0,1);
   theta_0z ~ normal(0,1);
   mu_0 ~ normal(0,1);
-  betas ~ normal(0,10); 
+  betas ~ normal(0,1); 
   
   //random effects
   sd_zp ~ exponential(1);
