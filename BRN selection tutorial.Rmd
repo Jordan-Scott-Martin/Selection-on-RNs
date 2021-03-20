@@ -567,7 +567,7 @@ mean(diff) #expected difference between regression coefs
 mad(diff) #median absolute deviation (robust SD) of expected difference
 quantile(diff, c(0.05,0.95)) #90% CI of expected difference
 ```
-We can see that the posterior is centered near zero, with an expected difference of -0.003 and a very wide 90% CI. One might report this in a manuscript by stating that, "Little to no evidence was found for stronger directional selection on personality as compared to plasticity ($\Delta\beta = -0.00, \ \mathrm{MAD}=0.14, \ 90\% \mathrm{CI} [-0.23, 0.23], \ p_+ = 0.48$), suggesting that these RN parameters had equivalent effects on individual fitness".
+We can see that the posterior is centered near zero, with an expected difference of -0.003 and a very wide 90% CI. One might report this in a manuscript by stating that, "Little to no evidence was found for stronger directional selection on personality as compared to plasticity ($\Delta\beta = -0.00, \ \mathrm{MAD}=0.14, \ 90\% \mathrm{CI} [-0.23, 0.23], \ p_+ = 0.48$), suggesting that these RN parameters had approximately equivalent effects on individual fitness".
 
 If one is so inclined, robust null hypothesis tests can also be conducted within a Bayesian framework by specifying a range of biologically trivial effect sizes. For example, on a standardized scale such as a regression coefficient, values $-0.10<r<0.10$ are considered extremely small, explaining less than 1% of variance in a measure. We might, therefore, think of these as "trivial hypothesis" tests rather than null hypothesis tests per se. Comparing these trivial hypothesis tests with directional hypothesis tests can provide distinct pieces of information. Consider the RN parameter correlations
 \pagebreak
