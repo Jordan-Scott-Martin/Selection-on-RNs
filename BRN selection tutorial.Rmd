@@ -694,14 +694,14 @@ There is clear evidence that selection is acting to increase the mean levels of 
 
 For the variances and covariances of these parameters
 ```{r}
-#expected total mean change (personality, plasticity, predictability)
+#expected total vcv change (personality, plasticity, predictability)
 apply(simplify2array(dT_vcv), 1:2, median)
-#90% CI for mean change
+#90% CI for vcv change
 apply(simplify2array(dT_vcv), 1:2, function(x) quantile(x,c(0.05,0.95)))
 
-#expected direct mean change
+#expected direct vcv change
 apply(simplify2array(dD_vcv), 1:2, median)
-#90% CI for mean change
+#90% CI for vcv change
 apply(simplify2array(dD_vcv), 1:2, function(x) quantile(x,c(0.05,0.95)))
 ```
 Note that the 90% CIs are calculated across the columns of the $\Delta_{\mathrm{T}} \boldsymbol{\mathrm{P}}$ and $\Delta_{\mathrm{D}} \boldsymbol{\mathrm{P}}$ matrices. We find evidence that both direct and indirect selection are increasing the (co)variance of the RN parameters. However, the direct effect of selection on trait (co)variances is less certain and of smaller magnitude. Phenotypic integration among RN parameters is thus leading to greater individual variation and trait correlations than would otherwise be expected by the direct effects of selection alone.
