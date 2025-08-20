@@ -16,12 +16,12 @@ suppressMessages(library(rethinking))
 #J = total number of individuals (even number)
 #rep_z = repeated phenotype measures per subject (>1)
 #rep_W = repeated fitness measures per subject (>0)
+#lv_sigma0 = log residual variance of phenotype 
 #l_es = lower selection effect size (absolute value)
 #u_es = upper selection effect size (absolute value)
 #stan_list = should the data be returned as a list (T) or data frame (F)
-sim_RN_Gaus = function(J, rep_z, rep_W, l_es, u_es,
-                       mu_0 = 0, beta_x = 0, sigma_0 = log(0.6), W_0 = 1, delta = 1,
-                       V_P = 0.3, V_W0 = 0.3, lkj_cor = 10){
+sim_RN_Gaus = function(J, rep_z, rep_W, l_es, u_es, mu_0 = 0, beta_x = 0, W_0 = 1, 
+                       V_P = 1, V_W0 = 1, delta = 1, lv_sigma0 = log(2), lkj_cor = 10){
   try(if(rep_z < 2) stop("Estimating individual reaction norms requires repeated measures."))
   try(if(l_es < 0) stop("l_es is an absolute value. Please input a positive number."))
   try(if(u_es < 0) stop("u_es is an absolute value. Please input a positive number."))
@@ -37,7 +37,7 @@ sim_RN_Gaus = function(J, rep_z, rep_W, l_es, u_es,
   #fixed population effects
   mu_0z = mu_0 #z intercept
   beta_z = beta_x #z slope
-  sigma_0z = sigma_0 #z dispersion
+  sigma_0z = lv_sigma0 #z dispersion
   theta_0w = W_0 #w intercept
   delta_0w = delta
   
@@ -99,7 +99,7 @@ sim_RN_Gaus = function(J, rep_z, rep_W, l_es, u_es,
     qc[1]*(zp_mu[ind_W] * zp_beta[ind_W]) + 
     qc[2]*(zp_mu[ind_W] * zp_sigma[ind_W]) + 
     qc[3]*(zp_beta[ind_W] * zp_sigma[ind_W])
-  W = rnorm(N_W, W_eta, delta_0w) 
+  W = rnorm(N_W, W_eta, sqrt(delta_0w + V_W0) ) 
   }
   
   #list of variables and generated modeled data
@@ -108,6 +108,13 @@ sim_RN_Gaus = function(J, rep_z, rep_W, l_es, u_es,
               true_b = b, true_q = q, true_qc = qc))
 }
 
-
-#more functions for simulating data and plotting results are in development
-#and should be available for general use within a month or two
+#this function simplifies the extraction of posterior samples
+#from cmdstan objects to match traditional rstan functions
+extract = function(fit_obj) {
+  vars = fit_obj$metadata()$stan_variables
+  draws = posterior::as_draws_rvars(fit_obj$draws())
+  
+  lapply(vars, \(var_name){  
+    posterior::draws_of(draws[[var_name]], with_chains = FALSE)
+  }) |> setNames(vars)
+}
