@@ -96,7 +96,7 @@ simf = function(){
 
 #generate datasets
 dl_sim = list()
-for(i in 1:1000){
+for(i in 1:500){
   dl_sim[[i]] = simf()
 }
 saveRDS(dl_sim, "dl_sim.RDS")
@@ -118,7 +118,7 @@ p_mat = matrix(NA, nrow = length(dl_sim), ncol = 3*3*3 + length(unlist(dl_sim[[1
                                names(unlist(dl_sim[[1]]$params))) ))
 
 #run simulation
-for(i in 590:length(dl_sim)){
+for(i in 1:length(dl_sim)){
   
   #if 1 fitness measure
   if(dl_sim[[i]]$params$rep_w==1){
@@ -212,7 +212,6 @@ for(i in 590:length(dl_sim)){
 
 #load results
 p_mat = readRDS("p_mat.RDS")
-p_mat = p_mat[1:500,]
 
 #wide to long
 p_mat$wsd = sqrt(rowSums(p_mat[,c(28:36)]^2)+1)
@@ -227,7 +226,7 @@ pml$power = prob$prob
 pml$es = es$es
 pml$variable = es$variable
 pml$bias = pml$bias
-pml$rmsd = sqrt(pml$rmsd) #sqrt and normalize by sd
+pml$rmsd = sqrt(pml$rmsd) 
 pml = subset(pml, select = -wsd)
 pml = droplevels(pml)
 pml$sg = ifelse(grepl("b",pml$variable), "beta", ifelse(grepl("qc",pml$variable), "corr", "quad"))
